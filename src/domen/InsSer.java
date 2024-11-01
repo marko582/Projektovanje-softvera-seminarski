@@ -15,6 +15,7 @@ public class InsSer {
     private Sertifikat sertifikat;
     private Date datumIzdavanja;
 
+    
     public InsSer(Instruktor instruktor, Sertifikat sertifikat, Date datumIzdavanja) {
         this.instruktor = instruktor;
         this.sertifikat = sertifikat;
