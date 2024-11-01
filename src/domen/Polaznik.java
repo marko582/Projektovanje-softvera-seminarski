@@ -19,7 +19,7 @@ public class Polaznik {
     private Date datumRodjenja;
     private Kategorija kategorija;
 
-    public Polaznik(long id, String ime, String prezime, String email, String brojTelefona, Date datumRodjenja, Kategorija kategorija) {
+    public Polaznik(Long id, String ime, String prezime, String email, String brojTelefona, Date datumRodjenja, Kategorija kategorija) {
         this.id = id;
         this.ime = ime;
         this.prezime = prezime;
@@ -29,11 +29,11 @@ public class Polaznik {
         this.kategorija = kategorija;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -84,6 +84,7 @@ public class Polaznik {
     public void setKategorija(Kategorija kategorija) {
         this.kategorija = kategorija;
     }
-    
+
+   
     
 }

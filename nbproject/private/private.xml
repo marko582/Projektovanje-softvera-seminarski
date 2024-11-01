@@ -3,9 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/projektovanje/softvera/ProjektovanjeSoftvera.java</file>
-            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/projektovanje/softvera/Login.java</file>
-            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/projektovanje/softvera/Glavna.java</file>
+            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/ui/Login.java</file>
+            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/ui/DodavanjePolaznika.java</file>
+            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/ui/Glavna.java</file>
+            <file>file:/C:/Users/Windows%20HD/Documents/NetBeansProjects/Projektovanje-softvera/src/ui/ProjektovanjeSoftvera.java</file>
         </group>
     </open-files>
 </project-private>
