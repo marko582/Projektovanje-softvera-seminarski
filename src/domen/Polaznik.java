@@ -85,6 +85,12 @@ public class Polaznik {
         this.kategorija = kategorija;
     }
 
+    @Override
+    public String toString() {
+        return getIme()+" "+getPrezime();
+    }
+
+    
    
     
 }

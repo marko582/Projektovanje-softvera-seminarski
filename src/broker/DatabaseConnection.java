@@ -18,7 +18,7 @@ public class DatabaseConnection {
     private static Connection conn = null;
     
     private void init() throws SQLException {
-        final String DB_URL = "jdbc:mysql://localhost:3306/ProjektovanjeSoftvera1";
+        final String DB_URL = "jdbc:mysql://localhost:3306/projsoft";
         final String USER = "root";
         final String PASS = "";
         

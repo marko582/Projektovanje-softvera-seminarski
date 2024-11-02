@@ -4,7 +4,14 @@
  */
 package ui;
 
+import domen.Instruktor;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import kontroleri.KontrolerInstruktor;
 
 /**
  *
@@ -96,8 +103,28 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPrijavaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrijavaActionPerformed
-        this.setVisible(false);
-        new Glavna().setVisible(true);
+        String korisnickoIme = txtKorisnickoIme.getText();
+        String lozinka = txtLozinka.getText();
+
+        try {
+            List<Instruktor> instruktori = KontrolerInstruktor.getList();
+            for(Instruktor i : instruktori){
+                if(i.getKorisnickoIme().equals(korisnickoIme) && i.getLozinka().equals(lozinka)){
+                    
+                    this.dispose();
+                    JFrame glavna = new Glavna(korisnickoIme);
+                    glavna.setVisible(true);
+                    
+                    return;
+                }
+            }
+            
+            JOptionPane.showMessageDialog(null, "Korisnicko ime ili lozinka nisu ispravni","Greska",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+
         
     }//GEN-LAST:event_btnPrijavaActionPerformed
 
@@ -111,4 +138,8 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JTextField txtKorisnickoIme;
     private javax.swing.JPasswordField txtLozinka;
     // End of variables declaration//GEN-END:variables
+
+    private String getKorisnickoImeLogin() {
+        return txtKorisnickoIme.getText();
+    }
 }

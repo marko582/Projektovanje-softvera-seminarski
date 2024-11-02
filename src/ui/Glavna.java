@@ -4,7 +4,12 @@
  */
 package ui;
 
+import domen.Polaznik;
+import java.sql.SQLException;
+import java.util.List;
+import javax.swing.ComboBoxModel;
 import javax.swing.JFrame;
+import kontroleri.KontrolerPolaznik;
 
 /**
  *
@@ -21,6 +26,19 @@ public class Glavna extends javax.swing.JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    public Glavna(String korisnickoIme) throws SQLException{
+        initComponents();
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        lblInstruktor.setText(korisnickoIme);
+        
+        List<Polaznik> polaznici = KontrolerPolaznik.getList();
+        for(Polaznik p : polaznici){
+            cmb1.addItem(p);
+        }
+        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -34,27 +52,34 @@ public class Glavna extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        lblInstruktor = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(120, 0), new java.awt.Dimension(32767, 0));
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jPanel3 = new javax.swing.JPanel();
+        cmb1 = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        txtIme = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        txtPrezime = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        txtEmail = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
+        txtBrTel = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
+        txtDatRodj = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
+        txtKategorija = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        txtPlanObuke = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtCenaObuke = new javax.swing.JTextField();
+        jButton6 = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jButton5 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -64,6 +89,8 @@ public class Glavna extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -74,8 +101,12 @@ public class Glavna extends javax.swing.JFrame {
         jPanel2.setPreferredSize(new java.awt.Dimension(565, 50));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 20, 15));
 
-        jLabel1.setText("jLabel1");
+        jLabel1.setText("Korisniko ime:");
         jPanel2.add(jLabel1);
+
+        lblInstruktor.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblInstruktor.setText("username");
+        jPanel2.add(lblInstruktor);
 
         jButton1.setText("Odjavite se");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -110,103 +141,106 @@ public class Glavna extends javax.swing.JFrame {
 
         jPanel4.add(jScrollPane1);
 
-        jPanel5.setMaximumSize(new java.awt.Dimension(300, 32767));
-        jPanel5.setPreferredSize(new java.awt.Dimension(300, 423));
+        jPanel5.setMaximumSize(new java.awt.Dimension(325, 32767));
+        jPanel5.setPreferredSize(new java.awt.Dimension(325, 423));
+        jPanel5.setLayout(new javax.swing.BoxLayout(jPanel5, javax.swing.BoxLayout.PAGE_AXIS));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jPanel3.setPreferredSize(new java.awt.Dimension(325, 400));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 20));
+
+        cmb1.setMaximumSize(new java.awt.Dimension(300, 32767));
+        cmb1.setMinimumSize(new java.awt.Dimension(300, 22));
+        cmb1.setPreferredSize(new java.awt.Dimension(300, 22));
+        cmb1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmb1ItemStateChanged(evt);
+            }
+        });
+        jPanel3.add(cmb1);
 
         jLabel3.setText("Ime:");
+        jLabel3.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel3);
 
-        jButton5.setForeground(new java.awt.Color(255, 51, 51));
-        jButton5.setText("Obrisi cas");
-        jButton5.setEnabled(false);
+        txtIme.setEditable(false);
+        txtIme.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtIme);
+
+        jLabel4.setText("Prezime:");
+        jLabel4.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel4);
+
+        txtPrezime.setEditable(false);
+        txtPrezime.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtPrezime);
+
+        jLabel5.setText("Email:");
+        jLabel5.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel5);
+
+        txtEmail.setEditable(false);
+        txtEmail.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtEmail);
+
+        jLabel6.setText("Broj telefona:");
+        jLabel6.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel6);
+
+        txtBrTel.setEditable(false);
+        txtBrTel.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtBrTel);
+
+        jLabel7.setText("Datum rodjenja:");
+        jLabel7.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel7);
+
+        txtDatRodj.setEditable(false);
+        txtDatRodj.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtDatRodj);
+
+        jLabel8.setText("Kategorija:");
+        jLabel8.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel8);
+
+        txtKategorija.setEditable(false);
+        txtKategorija.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtKategorija);
+
+        jLabel9.setText("Plan obuke:");
+        jLabel9.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel9);
+
+        txtPlanObuke.setEditable(false);
+        txtPlanObuke.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtPlanObuke);
+
+        jLabel10.setText("Cena obuke:");
+        jLabel10.setPreferredSize(new java.awt.Dimension(90, 20));
+        jPanel3.add(jLabel10);
+
+        txtCenaObuke.setEditable(false);
+        txtCenaObuke.setPreferredSize(new java.awt.Dimension(200, 20));
+        jPanel3.add(txtCenaObuke);
 
         jButton6.setForeground(new java.awt.Color(255, 51, 51));
         jButton6.setText("Obrisi polaznika");
         jButton6.setEnabled(false);
+        jButton6.setPreferredSize(new java.awt.Dimension(250, 45));
+        jPanel3.add(jButton6);
 
-        jLabel4.setText("Prezime:");
+        jPanel5.add(jPanel3);
 
-        jTextField1.setEditable(false);
+        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout();
+        flowLayout1.setAlignOnBaseline(true);
+        jPanel6.setLayout(flowLayout1);
 
-        jTextField2.setEditable(false);
+        jButton5.setForeground(new java.awt.Color(255, 51, 51));
+        jButton5.setText("Obrisi cas");
+        jButton5.setEnabled(false);
+        jButton5.setPreferredSize(new java.awt.Dimension(250, 45));
+        jPanel6.add(jButton5);
 
-        jLabel5.setText("Email:");
-
-        jTextField3.setEditable(false);
-
-        jLabel6.setText("Broj telefona:");
-
-        jTextField4.setEditable(false);
-
-        jLabel7.setText("Datum rodjenja:");
-
-        jTextField5.setEditable(false);
-
-        jLabel8.setText("Kategorija:");
-
-        jTextField6.setEditable(false);
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap(31, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton6))
-                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.Alignment.LEADING))
-                .addGap(21, 21, 21))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(8, 8, 8)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(8, 8, 8)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(8, 8, 8)
-                .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton5)
-                    .addComponent(jButton6))
-                .addGap(54, 54, 54))
-        );
+        jPanel5.add(jPanel6);
 
         jPanel4.add(jPanel5);
 
@@ -245,6 +279,18 @@ public class Glavna extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu3.setText("Prikazi");
+
+        jMenuItem7.setText("Sertifikat");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem7);
+
+        jMenuBar1.add(jMenu3);
+
         setJMenuBar(jMenuBar1);
 
         pack();
@@ -260,23 +306,39 @@ public class Glavna extends javax.swing.JFrame {
         new Login().setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void cmb1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmb1ItemStateChanged
+        Polaznik p = (Polaznik) cmb1.getSelectedItem();
+        txtIme.setText(p.getIme());
+        txtPrezime.setText(p.getPrezime());
+        txtEmail.setText(p.getEmail());
+        txtBrTel.setText(p.getBrojTelefona());
+        txtDatRodj.setText(p.getDatumRodjenja().toString());
+    }//GEN-LAST:event_cmb1ItemStateChanged
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<Polaznik> cmb1;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -284,17 +346,23 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
+    private javax.swing.JLabel lblInstruktor;
+    private javax.swing.JTextField txtBrTel;
+    private javax.swing.JTextField txtCenaObuke;
+    private javax.swing.JTextField txtDatRodj;
+    private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtIme;
+    private javax.swing.JTextField txtKategorija;
+    private javax.swing.JTextField txtPlanObuke;
+    private javax.swing.JTextField txtPrezime;
     // End of variables declaration//GEN-END:variables
 }
