@@ -73,6 +73,11 @@ public class Instruktor {
         this.lozinka = lozinka;
     }
 
+    @Override
+    public String toString() {
+        return getIme()+" "+getPrezime();
+    }
+
     
     
 }

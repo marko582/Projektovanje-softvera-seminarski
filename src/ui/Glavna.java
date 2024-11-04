@@ -4,11 +4,14 @@
  */
 package ui;
 
+import broker.DatabaseConnection;
 import domen.Polaznik;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
-import javax.swing.ComboBoxModel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import kontroleri.KontrolerPolaznik;
 
 /**
@@ -35,7 +38,7 @@ public class Glavna extends javax.swing.JFrame {
         
         List<Polaznik> polaznici = KontrolerPolaznik.getList();
         for(Polaznik p : polaznici){
-            cmb1.addItem(p);
+            cmbPolaznik.addItem(p);
         }
         
     }
@@ -53,14 +56,13 @@ public class Glavna extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         lblInstruktor = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(120, 0), new java.awt.Dimension(32767, 0));
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        cmb1 = new javax.swing.JComboBox<>();
+        cmbPolaznik = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
         txtIme = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -77,7 +79,7 @@ public class Glavna extends javax.swing.JFrame {
         txtPlanObuke = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         txtCenaObuke = new javax.swing.JTextField();
-        jButton6 = new javax.swing.JButton();
+        btnObrisiPolaznik = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -89,11 +91,13 @@ public class Glavna extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        jMenuItem7 = new javax.swing.JMenuItem();
+        meniNalog = new javax.swing.JMenu();
+        jMenuItem8 = new javax.swing.JMenuItem();
+        jMenuItem9 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setResizable(false);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.PAGE_AXIS));
 
@@ -101,20 +105,12 @@ public class Glavna extends javax.swing.JFrame {
         jPanel2.setPreferredSize(new java.awt.Dimension(565, 50));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 20, 15));
 
-        jLabel1.setText("Korisniko ime:");
+        jLabel1.setText("Dobrodosao/la");
         jPanel2.add(jLabel1);
 
         lblInstruktor.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblInstruktor.setText("username");
         jPanel2.add(lblInstruktor);
-
-        jButton1.setText("Odjavite se");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jButton1);
         jPanel2.add(filler1);
 
         jPanel1.add(jPanel2);
@@ -148,22 +144,27 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.setPreferredSize(new java.awt.Dimension(325, 400));
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 20));
 
-        cmb1.setMaximumSize(new java.awt.Dimension(300, 32767));
-        cmb1.setMinimumSize(new java.awt.Dimension(300, 22));
-        cmb1.setPreferredSize(new java.awt.Dimension(300, 22));
-        cmb1.addItemListener(new java.awt.event.ItemListener() {
+        cmbPolaznik.setMaximumSize(new java.awt.Dimension(300, 32767));
+        cmbPolaznik.setMinimumSize(new java.awt.Dimension(300, 22));
+        cmbPolaznik.setPreferredSize(new java.awt.Dimension(300, 22));
+        cmbPolaznik.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmb1ItemStateChanged(evt);
+                cmbPolaznikItemStateChanged(evt);
             }
         });
-        jPanel3.add(cmb1);
+        cmbPolaznik.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbPolaznikActionPerformed(evt);
+            }
+        });
+        jPanel3.add(cmbPolaznik);
 
         jLabel3.setText("Ime:");
         jLabel3.setPreferredSize(new java.awt.Dimension(90, 20));
         jPanel3.add(jLabel3);
 
         txtIme.setEditable(false);
-        txtIme.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtIme.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtIme);
 
         jLabel4.setText("Prezime:");
@@ -171,7 +172,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel4);
 
         txtPrezime.setEditable(false);
-        txtPrezime.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtPrezime.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtPrezime);
 
         jLabel5.setText("Email:");
@@ -179,7 +180,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel5);
 
         txtEmail.setEditable(false);
-        txtEmail.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtEmail.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtEmail);
 
         jLabel6.setText("Broj telefona:");
@@ -187,7 +188,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel6);
 
         txtBrTel.setEditable(false);
-        txtBrTel.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtBrTel.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtBrTel);
 
         jLabel7.setText("Datum rodjenja:");
@@ -195,7 +196,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel7);
 
         txtDatRodj.setEditable(false);
-        txtDatRodj.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtDatRodj.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtDatRodj);
 
         jLabel8.setText("Kategorija:");
@@ -203,7 +204,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel8);
 
         txtKategorija.setEditable(false);
-        txtKategorija.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtKategorija.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtKategorija);
 
         jLabel9.setText("Plan obuke:");
@@ -211,7 +212,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel9);
 
         txtPlanObuke.setEditable(false);
-        txtPlanObuke.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtPlanObuke.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtPlanObuke);
 
         jLabel10.setText("Cena obuke:");
@@ -219,14 +220,18 @@ public class Glavna extends javax.swing.JFrame {
         jPanel3.add(jLabel10);
 
         txtCenaObuke.setEditable(false);
-        txtCenaObuke.setPreferredSize(new java.awt.Dimension(200, 20));
+        txtCenaObuke.setPreferredSize(new java.awt.Dimension(200, 25));
         jPanel3.add(txtCenaObuke);
 
-        jButton6.setForeground(new java.awt.Color(255, 51, 51));
-        jButton6.setText("Obrisi polaznika");
-        jButton6.setEnabled(false);
-        jButton6.setPreferredSize(new java.awt.Dimension(250, 45));
-        jPanel3.add(jButton6);
+        btnObrisiPolaznik.setForeground(new java.awt.Color(255, 51, 51));
+        btnObrisiPolaznik.setText("Obrisi polaznika");
+        btnObrisiPolaznik.setPreferredSize(new java.awt.Dimension(250, 45));
+        btnObrisiPolaznik.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnObrisiPolaznikActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnObrisiPolaznik);
 
         jPanel5.add(jPanel3);
 
@@ -259,6 +264,11 @@ public class Glavna extends javax.swing.JFrame {
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setText("Instruktor");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem2);
 
         jMenuItem3.setText("Cas");
@@ -267,8 +277,18 @@ public class Glavna extends javax.swing.JFrame {
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Izmeni");
+        jMenu2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu2ActionPerformed(evt);
+            }
+        });
 
         jMenuItem4.setText("Polaznik");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem4);
 
         jMenuItem5.setText("Instruktor");
@@ -279,17 +299,20 @@ public class Glavna extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("Prikazi");
+        meniNalog.setText("Nalog");
 
-        jMenuItem7.setText("Sertifikat");
-        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem8.setText("prikazi");
+        meniNalog.add(jMenuItem8);
+
+        jMenuItem9.setText("odjavite se");
+        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem7ActionPerformed(evt);
+                jMenuItem9ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem7);
+        meniNalog.add(jMenuItem9);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(meniNalog);
 
         setJMenuBar(jMenuBar1);
 
@@ -297,36 +320,82 @@ public class Glavna extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        new DodavanjePolaznika(this, true).setVisible(true);
+        try {
+            new DodavanjePolaznika(this, true).setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        this.dispose();
-        new Login().setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem7ActionPerformed
-
-    private void cmb1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmb1ItemStateChanged
-        Polaznik p = (Polaznik) cmb1.getSelectedItem();
+    private void cmbPolaznikItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPolaznikItemStateChanged
+        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
         txtIme.setText(p.getIme());
         txtPrezime.setText(p.getPrezime());
         txtEmail.setText(p.getEmail());
         txtBrTel.setText(p.getBrojTelefona());
         txtDatRodj.setText(p.getDatumRodjenja().toString());
-    }//GEN-LAST:event_cmb1ItemStateChanged
+        txtKategorija.setText(p.getKategorija().getNaziv());
+        
+    }//GEN-LAST:event_cmbPolaznikItemStateChanged
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        this.dispose();
+        new Registracija().setVisible(true);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
+        this.dispose();
+        new Login().setVisible(true);
+    }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void btnObrisiPolaznikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnObrisiPolaznikActionPerformed
+        try {
+            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            Object[] opcije = {"Da", "Ne"};
+            int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da obrisete polaznika "
+                    +p.getIme()+" "+p.getPrezime()+"?","Dodavanje polaznika",
+                    JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
+
+            if(izbor == JOptionPane.YES_OPTION){
+                Connection conn = DatabaseConnection.getInstance();
+                Statement st = conn.createStatement();
+                String query = "DELETE FROM polaznik WHERE id="+p.getId();
+                st.executeUpdate(query);
+                st.close();
+                cmbPolaznik.removeItem(p);
+                JOptionPane.showMessageDialog(null, "Polaznik "+p.getIme()+" "+p.getPrezime() +" uspesno obrisan.","Brisanje polaznika",JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnObrisiPolaznikActionPerformed
+
+    private void cmbPolaznikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPolaznikActionPerformed
+
+    }//GEN-LAST:event_cmbPolaznikActionPerformed
+
+    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
+
+        
+    }//GEN-LAST:event_jMenu2ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        try {
+            new IzmenaPolaznika(this, true).setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<Polaznik> cmb1;
+    private javax.swing.JButton btnObrisiPolaznik;
+    private javax.swing.JComboBox<Polaznik> cmbPolaznik;
     private javax.swing.Box.Filler filler1;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
@@ -338,7 +407,6 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -346,7 +414,8 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -356,6 +425,7 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblInstruktor;
+    private javax.swing.JMenu meniNalog;
     private javax.swing.JTextField txtBrTel;
     private javax.swing.JTextField txtCenaObuke;
     private javax.swing.JTextField txtDatRodj;

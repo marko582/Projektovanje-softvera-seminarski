@@ -4,7 +4,6 @@
  */
 package ui;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
-
 /**
  *
  * @author Windows HD
@@ -17,6 +16,8 @@ public class ProjektovanjeSoftvera {
     public static void main(String[] args) {
         FlatMacLightLaf.setup();
         new Login().setVisible(true);
+          
+
     }
     
 }

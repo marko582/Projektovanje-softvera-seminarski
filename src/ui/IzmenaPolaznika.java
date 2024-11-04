@@ -3,30 +3,34 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package ui;
-import broker.DatabaseConnection;
+
 import domen.Instruktor;
 import domen.Kategorija;
-import java.sql.*;
+import domen.Polaznik;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 import kontroleri.KontrolerInstruktor;
 import kontroleri.KontrolerKategorija;
+import kontroleri.KontrolerPolaznik;
 
 /**
  *
  * @author Windows HD
  */
-public class DodavanjePolaznika extends javax.swing.JDialog {
+public class IzmenaPolaznika extends javax.swing.JDialog {
 
     /**
-     * Creates new form Dodavanje
+     * Creates new form IzmenaPolaznika
      */
-    public DodavanjePolaznika(java.awt.Frame parent, boolean modal) throws SQLException {
+    public IzmenaPolaznika(java.awt.Frame parent, boolean modal) throws SQLException {
         super(parent, modal);
         initComponents();
-        this.setLocationRelativeTo(this);
+        
+        List<Polaznik> polaznici = KontrolerPolaznik.getList();
+        for(Polaznik p : polaznici){
+            cmbPolaznik.addItem(p);
+        }
         List<Kategorija> kategorije = KontrolerKategorija.getList();
         for (Kategorija k : kategorije){
             cmbKategorija.addItem(k);
@@ -35,6 +39,7 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         for (Instruktor i : instruktori){
             cmbInstruktori.addItem(i);
         }
+        
     }
 
     /**
@@ -48,6 +53,7 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
 
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        cmbPolaznik = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         txtIme = new javax.swing.JTextField();
@@ -63,20 +69,28 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         cmbKategorija = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         cmbInstruktori = new javax.swing.JComboBox<>();
-        jPanel4 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
 
-        setMaximumSize(new java.awt.Dimension(2147483647, 500));
-        setPreferredSize(new java.awt.Dimension(800, 450));
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(700, 600));
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.PAGE_AXIS));
 
         jPanel2.setMaximumSize(new java.awt.Dimension(32767, 50));
-        jPanel2.setPreferredSize(new java.awt.Dimension(573, 50));
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 10));
+        jPanel2.setPreferredSize(new java.awt.Dimension(573, 150));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 20));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setText("Dodavanje polaznika");
+        jLabel1.setText("Izmena podataka polaznika");
         jPanel2.add(jLabel1);
+
+        cmbPolaznik.setPreferredSize(new java.awt.Dimension(500, 30));
+        cmbPolaznik.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbPolaznikItemStateChanged(evt);
+            }
+        });
+        jPanel2.add(cmbPolaznik);
 
         getContentPane().add(jPanel2);
 
@@ -133,51 +147,43 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
 
         getContentPane().add(jPanel3);
 
-        jPanel4.setMaximumSize(new java.awt.Dimension(32767, 100));
-        jPanel4.setPreferredSize(new java.awt.Dimension(739, 100));
+        jPanel1.setMinimumSize(new java.awt.Dimension(100, 50));
+        jPanel1.setPreferredSize(new java.awt.Dimension(859, 75));
+        jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jButton2.setText("Dodaj");
+        jButton2.setText("Promeni");
+        jButton2.setPreferredSize(new java.awt.Dimension(150, 50));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
+        jPanel1.add(jButton2, new java.awt.GridBagConstraints());
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(274, 274, 274)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(290, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(34, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
-        );
-
-        getContentPane().add(jPanel4);
+        getContentPane().add(jPanel1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        try {
-            dodajPolaznika();
-        } catch (SQLException ex) {
-            Logger.getLogger(DodavanjePolaznika.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void cmbPolaznikItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPolaznikItemStateChanged
+        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+        txtIme.setText(p.getIme());
+        txtPrezime.setText(p.getPrezime());
+        txtEmail.setText(p.getEmail());
+        txtBrTel.setText(p.getBrojTelefona());
+        txtDatumRodj.setDate(p.getDatumRodjenja());
+//        cmbKategorija.setSelectedItem(p.getKategorija());
+    }//GEN-LAST:event_cmbPolaznikItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<Instruktor> cmbInstruktori;
     private javax.swing.JComboBox<Kategorija> cmbKategorija;
+    private javax.swing.JComboBox<Polaznik> cmbPolaznik;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -187,42 +193,13 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JTextField txtBrTel;
     private com.toedter.calendar.JDateChooser txtDatumRodj;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtIme;
     private javax.swing.JTextField txtPrezime;
     // End of variables declaration//GEN-END:variables
-
-    private void dodajPolaznika() throws SQLException {
-        Connection conn = DatabaseConnection.getInstance();
-        String query="INSERT INTO polaznik (ime,prezime,email,brojTelefona,datumRodjenja,idKategorija) VALUES (?,?,?,?,?,?)";
-        PreparedStatement ps = conn.prepareStatement(query);
-        Long idKategorija=0l;
-        String query2="SELECT id FROM kategorija WHERE naziv='"+cmbKategorija.getSelectedItem()+"'";
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery(query2);
-        rs.next();
-        idKategorija=rs.getLong(1);
-        ps.setString(1, txtIme.getText());
-        ps.setString(2, txtPrezime.getText());
-        ps.setString(3, txtEmail.getText());
-        ps.setString(4, txtBrTel.getText());
-        ps.setDate(5, new java.sql.Date(((java.util.Date)txtDatumRodj.getDate()).getTime()));
-        ps.setLong(6, idKategorija);
-        ps.executeUpdate();
-        ps.close();
-        
-        Object[] opcije = {"Da", "Ne"};
-        int izbor = JOptionPane.showOptionDialog(this,"Da li zelite da dodate jos jednog polaznika?","Dodavanje polaznika",
-                JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
-        
-        if(izbor == JOptionPane.NO_OPTION){
-            this.dispose();
-        }
-    
-    }
 }

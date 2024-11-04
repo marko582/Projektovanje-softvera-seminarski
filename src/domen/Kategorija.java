@@ -33,6 +33,11 @@ public class Kategorija {
         this.naziv = naziv;
     }
 
+    @Override
+    public String toString() {
+        return getNaziv();
+    }
+
     
     
     
