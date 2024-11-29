@@ -200,7 +200,7 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
     private void dodajPolaznika() throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         String query="INSERT INTO polaznik (ime,prezime,email,brojTelefona,datumRodjenja,idKategorija) VALUES (?,?,?,?,?,?)";
-        PreparedStatement ps = conn.prepareStatement(query);
+        PreparedStatement ps = conn.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS);
         Long idKategorija=0l;
         String query2="SELECT id FROM kategorija WHERE naziv='"+cmbKategorija.getSelectedItem()+"'";
         Statement st = conn.createStatement();
@@ -214,8 +214,15 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         ps.setDate(5, new java.sql.Date(((java.util.Date)txtDatumRodj.getDate()).getTime()));
         ps.setLong(6, idKategorija);
         ps.executeUpdate();
+        rs=ps.getGeneratedKeys();
+        rs.next();
+        Long idPolaznik=rs.getLong(1);
         ps.close();
+        Instruktor instruktor = (Instruktor) cmbInstruktori.getSelectedItem();
+        String query3="INSERT INTO evidencijacasa (idInstruktor,idPolaznika) VALUES ("+instruktor.getId()+","
+                +idPolaznik+")";
         
+        st.executeUpdate(query3);
         Object[] opcije = {"Da", "Ne"};
         int izbor = JOptionPane.showOptionDialog(this,"Da li zelite da dodate jos jednog polaznika?","Dodavanje polaznika",
                 JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
@@ -223,6 +230,6 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         if(izbor == JOptionPane.NO_OPTION){
             this.dispose();
         }
-    
+        st.close();
     }
 }

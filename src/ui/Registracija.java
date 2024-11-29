@@ -53,7 +53,6 @@ public class Registracija extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         txtLozinka = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         txtEmail = new javax.swing.JTextField();
         txtIme = new javax.swing.JTextField();
         txtKorisnickoIme = new javax.swing.JTextField();
@@ -149,20 +148,6 @@ public class Registracija extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(6, 59, 0, 0);
         getContentPane().add(jLabel6, gridBagConstraints);
-
-        jButton1.setText("Prijavite se");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(18, 29, 18, 0);
-        getContentPane().add(jButton1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -199,16 +184,10 @@ public class Registracija extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnRegistracijaActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.dispose();
-        new Login().setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegistracija;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -238,7 +217,7 @@ public class Registracija extends javax.swing.JFrame {
             Connection conn = DatabaseConnection.getInstance();
             String query="INSERT INTO instruktor (ime,prezime,email,korisnickoIme,lozinka) VALUES (?,?,?,?,?)";
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, txtPrezime.getText());
+            ps.setString(1, txtIme.getText());
             ps.setString(2, txtPrezime.getText());
             ps.setString(3, txtEmail.getText());
             ps.setString(4, txtKorisnickoIme.getText());

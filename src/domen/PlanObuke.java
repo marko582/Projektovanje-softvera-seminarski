@@ -53,6 +53,11 @@ public class PlanObuke {
         this.trajanje = trajanje;
     }
 
+    @Override
+    public String toString() {
+        return naziv;
+    }
+
     
     
     

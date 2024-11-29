@@ -4,12 +4,21 @@
  */
 package ui;
 
+import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.Kategorija;
 import domen.Polaznik;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import kontroleri.KontrolerInstruktor;
 import kontroleri.KontrolerKategorija;
 import kontroleri.KontrolerPolaznik;
@@ -23,10 +32,11 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
     /**
      * Creates new form IzmenaPolaznika
      */
-    public IzmenaPolaznika(java.awt.Frame parent, boolean modal) throws SQLException {
+    public IzmenaPolaznika(java.awt.Frame parent, boolean modal, Instruktor ins) throws SQLException {
         super(parent, modal);
         initComponents();
-        
+        this.setLocationRelativeTo(null);
+                
         List<Polaznik> polaznici = KontrolerPolaznik.getList();
         for(Polaznik p : polaznici){
             cmbPolaznik.addItem(p);
@@ -39,7 +49,8 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         for (Instruktor i : instruktori){
             cmbInstruktori.addItem(i);
         }
-        
+        cmbKategorija.setSelectedItem(polaznici.get(0).getKategorija());
+        cmbInstruktori.setSelectedItem(ins);
     }
 
     /**
@@ -88,6 +99,11 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         cmbPolaznik.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbPolaznikItemStateChanged(evt);
+            }
+        });
+        cmbPolaznik.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbPolaznikActionPerformed(evt);
             }
         });
         jPanel2.add(cmbPolaznik);
@@ -166,7 +182,11 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-
+        try {
+            izmeniPolaznik();
+        } catch (SQLException ex) {
+            Logger.getLogger(IzmenaPolaznika.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void cmbPolaznikItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPolaznikItemStateChanged
@@ -176,8 +196,13 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         txtEmail.setText(p.getEmail());
         txtBrTel.setText(p.getBrojTelefona());
         txtDatumRodj.setDate(p.getDatumRodjenja());
-//        cmbKategorija.setSelectedItem(p.getKategorija());
+        cmbKategorija.setSelectedItem(p.getKategorija());
     }//GEN-LAST:event_cmbPolaznikItemStateChanged
+
+    private void cmbPolaznikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPolaznikActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_cmbPolaznikActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -202,4 +227,33 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
     private javax.swing.JTextField txtIme;
     private javax.swing.JTextField txtPrezime;
     // End of variables declaration//GEN-END:variables
+
+    private void izmeniPolaznik() throws SQLException {
+        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+        Object[] opcije = {"Da", "Ne"};
+        int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da izmenite podatke polaznika ?","Izmena polaznika",
+            JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
+
+        
+        
+            if(izbor == JOptionPane.YES_OPTION){
+                Connection conn = DatabaseConnection.getInstance();
+                Statement st = conn.createStatement();
+                Date datum = txtDatumRodj.getDate();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String formatiranDatum = sdf.format(datum);
+                String query = "UPDATE polaznik SET ime='"+txtIme.getText()+"',prezime='"+txtPrezime.getText()+
+                        "',email='"+txtEmail.getText()+"',brojTelefona='"+txtBrTel.getText()+
+                        "',datumRodjenja='"+formatiranDatum+"',idKategorija="
+                        +((Kategorija)cmbKategorija.getSelectedItem()).getId()
+                        + " WHERE id="+p.getId();
+                st.executeUpdate(query);
+                String query2="UPDATE evidencijacasa SET idInstruktor="+((Instruktor)cmbInstruktori.getSelectedItem()).getId()
+                        +" WHERE idPolaznika="+p.getId();
+                st.executeUpdate(query2);
+                st.close();
+                JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            }
+    }
 }

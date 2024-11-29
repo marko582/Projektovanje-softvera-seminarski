@@ -33,6 +33,11 @@ public class Sertifikat {
         this.naziv = naziv;
     }
 
+    @Override
+    public String toString() {
+        return "Sertifikat{" + "id=" + id + ", naziv=" + naziv + '}';
+    }
+
    
     
 }

@@ -4,6 +4,8 @@
  */
 package domen;
 
+import java.util.Objects;
+
 /**
  *
  * @author Windows HD
@@ -36,6 +38,25 @@ public class Kategorija {
     @Override
     public String toString() {
         return getNaziv();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Kategorija other = (Kategorija) obj;
+        if (!Objects.equals(this.naziv, other.naziv)) {
+            return false;
+        }
+        return Objects.equals(this.id, other.id);
     }
 
     

@@ -4,6 +4,8 @@
  */
 package domen;
 
+import java.util.Objects;
+
 /**
  *
  * @author Windows HD
@@ -76,6 +78,37 @@ public class Instruktor {
     @Override
     public String toString() {
         return getIme()+" "+getPrezime();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Instruktor other = (Instruktor) obj;
+        if (!Objects.equals(this.ime, other.ime)) {
+            return false;
+        }
+        if (!Objects.equals(this.prezime, other.prezime)) {
+            return false;
+        }
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        if (!Objects.equals(this.korisnickoIme, other.korisnickoIme)) {
+            return false;
+        }
+        if (!Objects.equals(this.lozinka, other.lozinka)) {
+            return false;
+        }
+        return Objects.equals(this.id, other.id);
     }
 
     

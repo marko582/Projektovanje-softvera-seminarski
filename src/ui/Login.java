@@ -138,7 +138,7 @@ public class Login extends javax.swing.JFrame {
                 if(i.getKorisnickoIme().equals(korisnickoIme) && i.getLozinka().equals(lozinka)){
                     
                     this.dispose();
-                    JFrame glavna = new Glavna(korisnickoIme);
+                    JFrame glavna = new Glavna(i);
                     glavna.setVisible(true);
                     
                     return;

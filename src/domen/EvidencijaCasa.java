@@ -4,6 +4,8 @@
  */
 package domen;
 
+import java.util.List;
+
 /**
  *
  * @author Windows HD
@@ -14,12 +16,15 @@ public class EvidencijaCasa {
     private Instruktor instruktor;
     private Polaznik polaznik;
 
-    public EvidencijaCasa(Long id, Integer ukupnaCena, Instruktor instruktor, Polaznik polaznik) {
+    public EvidencijaCasa(Long id, Integer ukupnaCena, Instruktor instruktor, Polaznik polaznik, List<StavkaEvidencijeCasa> stavke) {
         this.id = id;
         this.ukupnaCena = ukupnaCena;
         this.instruktor = instruktor;
         this.polaznik = polaznik;
     }
+
+
+
 
     public Long getId() {
         return id;

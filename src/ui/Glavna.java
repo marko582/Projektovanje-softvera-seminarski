@@ -5,13 +5,23 @@
 package ui;
 
 import broker.DatabaseConnection;
+import domen.Instruktor;
+import domen.Kategorija;
+import domen.PlanObuke;
 import domen.Polaznik;
+import domen.StavkaEvidencijeCasa;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import kontroleri.KontrolerKategorija;
 import kontroleri.KontrolerPolaznik;
 
 /**
@@ -29,18 +39,49 @@ public class Glavna extends javax.swing.JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-    public Glavna(String korisnickoIme) throws SQLException{
+    Instruktor i;
+    Integer cenaObuke=0;
+    public Glavna(Instruktor i) throws SQLException{
         initComponents();
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        lblInstruktor.setText(korisnickoIme);
+        this.i=i;
         
-        List<Polaznik> polaznici = KontrolerPolaznik.getList();
+        lblInstruktor.setText(i.getKorisnickoIme());
+        
+        List<Polaznik> polaznici = KontrolerPolaznik.getList(i);
         for(Polaznik p : polaznici){
             cmbPolaznik.addItem(p);
         }
-        
+        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+        TableModel tm = tblCasovi.getModel();
+        DefaultTableModel dtm = (DefaultTableModel) tm;
+        dtm.setRowCount(0);
+        //lista stavki
+        Connection conn = DatabaseConnection.getInstance();
+        String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
+        "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
+        "WHERE instruktor.id=? AND polaznik.id=?";
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setLong(1, i.getId());
+        ps.setLong(2, p.getId());
+        ResultSet rs = ps.executeQuery();
+        List<StavkaEvidencijeCasa> stavke = new LinkedList<StavkaEvidencijeCasa>();
+        while(rs.next()){
+            StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
+                (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(), 
+                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), rs.getInt("cenaCasa"), 
+                rs.getString("komentar"), new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
+            
+            stavke.add(stavka);
+        }
+        for(StavkaEvidencijeCasa s: stavke){
+            Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getTrajanjeCasa(),s.getCenaCasa()};
+            cenaObuke+=s.getCenaCasa();
+            dtm.addRow(red);
+        }
+//        txtCenaObuke.setText(cenaObuke.toString());
     }
 
     /**
@@ -57,9 +98,11 @@ public class Glavna extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         lblInstruktor = new javax.swing.JLabel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(120, 0), new java.awt.Dimension(32767, 0));
+        jTextField1 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblCasovi = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         cmbPolaznik = new javax.swing.JComboBox<>();
@@ -72,25 +115,24 @@ public class Glavna extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         txtBrTel = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        txtDatRodj = new javax.swing.JTextField();
+        txtDatumRodj = new com.toedter.calendar.JDateChooser();
         jLabel8 = new javax.swing.JLabel();
-        txtKategorija = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
-        txtPlanObuke = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        txtCenaObuke = new javax.swing.JTextField();
+        cmbKategorija = new javax.swing.JComboBox<>();
         btnObrisiPolaznik = new javax.swing.JButton();
+        btnIzmena = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
-        jButton5 = new javax.swing.JButton();
+        btnObrisiCas = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
         meniNalog = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
@@ -113,11 +155,17 @@ public class Glavna extends javax.swing.JFrame {
         jPanel2.add(lblInstruktor);
         jPanel2.add(filler1);
 
+        jTextField1.setPreferredSize(new java.awt.Dimension(100, 22));
+        jPanel2.add(jTextField1);
+
+        jButton1.setText("Pretrazi");
+        jPanel2.add(jButton1);
+
         jPanel1.add(jPanel2);
 
         jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.LINE_AXIS));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblCasovi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -133,7 +181,12 @@ public class Glavna extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        tblCasovi.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCasoviMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblCasovi);
 
         jPanel4.add(jScrollPane1);
 
@@ -195,37 +248,21 @@ public class Glavna extends javax.swing.JFrame {
         jLabel7.setPreferredSize(new java.awt.Dimension(90, 20));
         jPanel3.add(jLabel7);
 
-        txtDatRodj.setEditable(false);
-        txtDatRodj.setPreferredSize(new java.awt.Dimension(200, 25));
-        jPanel3.add(txtDatRodj);
+        txtDatumRodj.setEnabled(false);
+        txtDatumRodj.setPreferredSize(new java.awt.Dimension(200, 25));
+        jPanel3.add(txtDatumRodj);
 
         jLabel8.setText("Kategorija:");
         jLabel8.setPreferredSize(new java.awt.Dimension(90, 20));
         jPanel3.add(jLabel8);
 
-        txtKategorija.setEditable(false);
-        txtKategorija.setPreferredSize(new java.awt.Dimension(200, 25));
-        jPanel3.add(txtKategorija);
-
-        jLabel9.setText("Plan obuke:");
-        jLabel9.setPreferredSize(new java.awt.Dimension(90, 20));
-        jPanel3.add(jLabel9);
-
-        txtPlanObuke.setEditable(false);
-        txtPlanObuke.setPreferredSize(new java.awt.Dimension(200, 25));
-        jPanel3.add(txtPlanObuke);
-
-        jLabel10.setText("Cena obuke:");
-        jLabel10.setPreferredSize(new java.awt.Dimension(90, 20));
-        jPanel3.add(jLabel10);
-
-        txtCenaObuke.setEditable(false);
-        txtCenaObuke.setPreferredSize(new java.awt.Dimension(200, 25));
-        jPanel3.add(txtCenaObuke);
+        cmbKategorija.setEnabled(false);
+        cmbKategorija.setPreferredSize(new java.awt.Dimension(200, 25));
+        jPanel3.add(cmbKategorija);
 
         btnObrisiPolaznik.setForeground(new java.awt.Color(255, 51, 51));
-        btnObrisiPolaznik.setText("Obrisi polaznika");
-        btnObrisiPolaznik.setPreferredSize(new java.awt.Dimension(250, 45));
+        btnObrisiPolaznik.setText("Ispisi polaznika");
+        btnObrisiPolaznik.setPreferredSize(new java.awt.Dimension(125, 45));
         btnObrisiPolaznik.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnObrisiPolaznikActionPerformed(evt);
@@ -233,17 +270,32 @@ public class Glavna extends javax.swing.JFrame {
         });
         jPanel3.add(btnObrisiPolaznik);
 
+        btnIzmena.setForeground(new java.awt.Color(0, 0, 255));
+        btnIzmena.setText("Omoguci izmenu");
+        btnIzmena.setPreferredSize(new java.awt.Dimension(125, 45));
+        btnIzmena.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIzmenaActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnIzmena);
+
         jPanel5.add(jPanel3);
 
         java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout();
         flowLayout1.setAlignOnBaseline(true);
         jPanel6.setLayout(flowLayout1);
 
-        jButton5.setForeground(new java.awt.Color(255, 51, 51));
-        jButton5.setText("Obrisi cas");
-        jButton5.setEnabled(false);
-        jButton5.setPreferredSize(new java.awt.Dimension(250, 45));
-        jPanel6.add(jButton5);
+        btnObrisiCas.setForeground(new java.awt.Color(255, 51, 51));
+        btnObrisiCas.setText("Obrisi cas");
+        btnObrisiCas.setEnabled(false);
+        btnObrisiCas.setPreferredSize(new java.awt.Dimension(250, 45));
+        btnObrisiCas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnObrisiCasActionPerformed(evt);
+            }
+        });
+        jPanel6.add(btnObrisiCas);
 
         jPanel5.add(jPanel6);
 
@@ -274,6 +326,14 @@ public class Glavna extends javax.swing.JFrame {
         jMenuItem3.setText("Cas");
         jMenu1.add(jMenuItem3);
 
+        jMenuItem7.setText("Plan obuke");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem7);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Izmeni");
@@ -297,14 +357,22 @@ public class Glavna extends javax.swing.JFrame {
         jMenuItem6.setText("Cas");
         jMenu2.add(jMenuItem6);
 
+        jMenuItem10.setText("Plan obuke");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem10);
+
         jMenuBar1.add(jMenu2);
 
         meniNalog.setText("Nalog");
 
-        jMenuItem8.setText("prikazi");
+        jMenuItem8.setText("Prikazi");
         meniNalog.add(jMenuItem8);
 
-        jMenuItem9.setText("odjavite se");
+        jMenuItem9.setText("Odjavite se");
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem9ActionPerformed(evt);
@@ -328,14 +396,30 @@ public class Glavna extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void cmbPolaznikItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPolaznikItemStateChanged
-        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-        txtIme.setText(p.getIme());
-        txtPrezime.setText(p.getPrezime());
-        txtEmail.setText(p.getEmail());
-        txtBrTel.setText(p.getBrojTelefona());
-        txtDatRodj.setText(p.getDatumRodjenja().toString());
-        txtKategorija.setText(p.getKategorija().getNaziv());
-        
+        try {
+            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            txtIme.setText(p.getIme());
+            txtPrezime.setText(p.getPrezime());
+            txtEmail.setText(p.getEmail());
+            txtBrTel.setText(p.getBrojTelefona());
+            txtDatumRodj.setDate(p.getDatumRodjenja());
+            List<Kategorija> kategorije = KontrolerKategorija.getList();
+            for (Kategorija k : kategorije){
+                cmbKategorija.addItem(k);
+            }
+            cmbKategorija.setSelectedItem(p.getKategorija());
+            
+            btnIzmena.setText("Omoguci izmenu");
+            txtIme.setEditable(false);
+            txtPrezime.setEditable(false);
+            txtBrTel.setEditable(false);
+            txtDatumRodj.setEnabled(false);
+            txtEmail.setEditable(false);
+            cmbKategorija.setEnabled(false);
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_cmbPolaznikItemStateChanged
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -352,29 +436,54 @@ public class Glavna extends javax.swing.JFrame {
         try {
             Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
             Object[] opcije = {"Da", "Ne"};
-            int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da obrisete polaznika "
-                    +p.getIme()+" "+p.getPrezime()+"?","Dodavanje polaznika",
+            int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da ispisete polaznika "
+                    +p.getIme()+" "+p.getPrezime()+"?","Ispisivanje polaznika",
                     JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
 
             if(izbor == JOptionPane.YES_OPTION){
                 Connection conn = DatabaseConnection.getInstance();
                 Statement st = conn.createStatement();
-                String query = "DELETE FROM polaznik WHERE id="+p.getId();
+                String query2 = "SELECT id FROM evidencijacasa WHERE idPolaznika="+p.getId() +" AND idInstruktor="+i.getId();
+                ResultSet rs = st.executeQuery(query2);
+                rs.next();
+                Long idCasa = rs.getLong(1);
+                String query = "UPDATE polaznik SET STATUS='upisan' WHERE id="+p.getId();
                 st.executeUpdate(query);
                 st.close();
                 cmbPolaznik.removeItem(p);
-                JOptionPane.showMessageDialog(null, "Polaznik "+p.getIme()+" "+p.getPrezime() +" uspesno obrisan.","Brisanje polaznika",JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Polaznik "+p.getIme()+" "+p.getPrezime() +" uspesno ispisan.","Ispisivanje polaznika",JOptionPane.INFORMATION_MESSAGE);
             }
+            
+            
+//            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+//            Object[] opcije = {"Da", "Ne"};
+//            int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da obrisete polaznika "
+//                    +p.getIme()+" "+p.getPrezime()+"?","Dodavanje polaznika",
+//                    JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
+//
+//            if(izbor == JOptionPane.YES_OPTION){
+//                Connection conn = DatabaseConnection.getInstance();
+//                Statement st = conn.createStatement();
+//                String query4 = "SELECT id FROM evidencijacasa WHERE idPolaznika="+p.getId() +" AND idInstruktor="+i.getId();
+//                ResultSet rs = st.executeQuery(query4);
+//                rs.next();
+//                Long idCasa = rs.getLong(1);
+//                String query3 ="DELETE FROM stavkaevidencijecasa WHERE id="+idCasa;
+//                st.executeUpdate(query3);
+//                String query2 = "DELETE FROM evidencijacasa WHERE idInstruktor="+i.getId() +" AND idPolaznika="+p.getId();
+//                st.executeUpdate(query2);
+//                String query = "DELETE FROM polaznik WHERE id="+p.getId();
+//                st.executeUpdate(query);
+//                st.close();
+//                cmbPolaznik.removeItem(p);
+//                JOptionPane.showMessageDialog(null, "Polaznik "+p.getIme()+" "+p.getPrezime() +" uspesno obrisan.","Brisanje polaznika",JOptionPane.INFORMATION_MESSAGE);
+//            
 
             
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnObrisiPolaznikActionPerformed
-
-    private void cmbPolaznikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPolaznikActionPerformed
-
-    }//GEN-LAST:event_cmbPolaznikActionPerformed
 
     private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
 
@@ -383,37 +492,167 @@ public class Glavna extends javax.swing.JFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         try {
-            new IzmenaPolaznika(this, true).setVisible(true);
+            new IzmenaPolaznika(this, true,i).setVisible(true);
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
+    private void cmbPolaznikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPolaznikActionPerformed
+        try {
+            // TODO add your handling code here:
+            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            TableModel tm = tblCasovi.getModel();
+            DefaultTableModel dtm = (DefaultTableModel) tm;
+            dtm.setRowCount(0);
+            //lista stavki
+            Connection conn = DatabaseConnection.getInstance();
+            String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
+                    "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
+                    "WHERE instruktor.id=? AND polaznik.id=?";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setLong(1, i.getId());
+            ps.setLong(2, p.getId());
+            ResultSet rs = ps.executeQuery();
+            List<StavkaEvidencijeCasa> stavke = new LinkedList<StavkaEvidencijeCasa>();
+            while(rs.next()){
+                StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
+                        (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(),
+                                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), rs.getInt("cenaCasa"),
+                                rs.getString("komentar"), new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
+                
+                stavke.add(stavka);
+            }
+            for(StavkaEvidencijeCasa s: stavke){
+                Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getTrajanjeCasa(),s.getCenaCasa()};
+                dtm.addRow(red);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_cmbPolaznikActionPerformed
+
+    private void btnObrisiCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnObrisiCasActionPerformed
+        // TODO add your handling code here:
+        int selektovanRedovi[]={};
+        selektovanRedovi=tblCasovi.getSelectedRows();
+//        for(int i=0;i<selektovanRedovi.length;i++){
+//        
+//        }
+    }//GEN-LAST:event_btnObrisiCasActionPerformed
+
+    private void tblCasoviMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCasoviMouseClicked
+        // TODO add your handling code here:
+        btnObrisiCas.setEnabled(true);
+    }//GEN-LAST:event_tblCasoviMouseClicked
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        try {
+            DodavanjePlanaObuke pof=new DodavanjePlanaObuke(this, true);
+            pof.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        // TODO add your handling code here:
+        try {
+            new IzmenaPlanaObuke(this, true).setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void btnIzmenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmenaActionPerformed
+        // TODO add your handling code here:
+        if(btnIzmena.getText().equals("Omoguci izmenu")){
+            txtIme.setEditable(true);
+            txtPrezime.setEditable(true);
+            txtBrTel.setEditable(true);
+            txtDatumRodj.setEnabled(true);
+            txtEmail.setEditable(true);
+            cmbKategorija.setEnabled(true);
+
+            btnIzmena.setText("Izmeni");
+            return;
+        }
+        if(btnIzmena.getText().equals("Izmeni")){
+            System.out.println("menjaj");
+            //izmena, update
+            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            Object[] opcije = {"Da", "Ne"};
+            int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da izmenite podatke polaznika ?","Izmena polaznika",
+            JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
+
+        
+        
+            if(izbor == JOptionPane.YES_OPTION){
+                try {
+                    Connection conn = DatabaseConnection.getInstance();
+                    Statement st = conn.createStatement();
+                    java.util.Date datum = txtDatumRodj.getDate();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String formatiranDatum = sdf.format(datum);
+                    String query = "UPDATE polaznik SET ime='"+txtIme.getText()+"',prezime='"+txtPrezime.getText()+
+                            "',email='"+txtEmail.getText()+"',brojTelefona='"+txtBrTel.getText()+
+                            "',datumRodjenja='"+formatiranDatum+"',idKategorija="
+                            +((Kategorija)cmbKategorija.getSelectedItem()).getId()
+                            + " WHERE id="+p.getId();
+                    st.executeUpdate(query);
+                    String query2="UPDATE evidencijacasa SET idInstruktor="+i.getId()
+                            +" WHERE idPolaznika="+p.getId();
+                    st.executeUpdate(query2);
+                    st.close();
+                    JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
+                    
+                    
+                    
+                    
+ 
+                } catch (SQLException ex) {
+                    Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            btnIzmena.setText("Omoguci izmenu");
+            txtIme.setEditable(false);
+            txtPrezime.setEditable(false);
+            txtBrTel.setEditable(false);
+            txtDatumRodj.setEnabled(false);
+            txtEmail.setEditable(false);
+            cmbKategorija.setEnabled(false);
+       }
+    }
+        
+    }//GEN-LAST:event_btnIzmenaActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnIzmena;
+    private javax.swing.JButton btnObrisiCas;
     private javax.swing.JButton btnObrisiPolaznik;
+    private javax.swing.JComboBox<Kategorija> cmbKategorija;
     private javax.swing.JComboBox<Polaznik> cmbPolaznik;
     private javax.swing.Box.Filler filler1;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
@@ -423,16 +662,14 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblInstruktor;
     private javax.swing.JMenu meniNalog;
+    private javax.swing.JTable tblCasovi;
     private javax.swing.JTextField txtBrTel;
-    private javax.swing.JTextField txtCenaObuke;
-    private javax.swing.JTextField txtDatRodj;
+    private com.toedter.calendar.JDateChooser txtDatumRodj;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtIme;
-    private javax.swing.JTextField txtKategorija;
-    private javax.swing.JTextField txtPlanObuke;
     private javax.swing.JTextField txtPrezime;
     // End of variables declaration//GEN-END:variables
 }
