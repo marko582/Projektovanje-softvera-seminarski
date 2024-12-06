@@ -4,6 +4,8 @@
  */
 package domen;
 
+import java.util.Objects;
+
 /**
  *
  * @author Windows HD
@@ -35,8 +37,35 @@ public class Sertifikat {
 
     @Override
     public String toString() {
-        return "Sertifikat{" + "id=" + id + ", naziv=" + naziv + '}';
+        return naziv;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Sertifikat other = (Sertifikat) obj;
+        if (!Objects.equals(this.naziv, other.naziv)) {
+            return false;
+        }
+        return Objects.equals(this.id, other.id);
+    }
+
+
+
 
    
     

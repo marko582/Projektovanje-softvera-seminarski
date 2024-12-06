@@ -17,6 +17,7 @@ public class Polaznik {
     private String email;
     private String brojTelefona;
     private Date datumRodjenja;
+    private String status="upisan";
     private Kategorija kategorija;
 
     public Polaznik(Long id, String ime, String prezime, String email, String brojTelefona, Date datumRodjenja, Kategorija kategorija) {
@@ -28,6 +29,15 @@ public class Polaznik {
         this.datumRodjenja = datumRodjenja;
         this.kategorija = kategorija;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
     public Long getId() {
         return id;

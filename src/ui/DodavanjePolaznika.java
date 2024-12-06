@@ -6,6 +6,7 @@ package ui;
 import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.Kategorija;
+import domen.Polaznik;
 import java.sql.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
     /**
      * Creates new form Dodavanje
      */
+    Long polaznikId;
     public DodavanjePolaznika(java.awt.Frame parent, boolean modal) throws SQLException {
         super(parent, modal);
         initComponents();
@@ -35,6 +37,8 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         for (Instruktor i : instruktori){
             cmbInstruktori.addItem(i);
         }
+        cmbInstruktori.setSelectedItem(null);
+        cmbKategorija.setSelectedItem(null);
     }
 
     /**
@@ -214,9 +218,11 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         ps.setDate(5, new java.sql.Date(((java.util.Date)txtDatumRodj.getDate()).getTime()));
         ps.setLong(6, idKategorija);
         ps.executeUpdate();
+        
         rs=ps.getGeneratedKeys();
         rs.next();
         Long idPolaznik=rs.getLong(1);
+        this.polaznikId=idPolaznik;
         ps.close();
         Instruktor instruktor = (Instruktor) cmbInstruktori.getSelectedItem();
         String query3="INSERT INTO evidencijacasa (idInstruktor,idPolaznika) VALUES ("+instruktor.getId()+","
@@ -224,12 +230,31 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         
         st.executeUpdate(query3);
         Object[] opcije = {"Da", "Ne"};
-        int izbor = JOptionPane.showOptionDialog(this,"Da li zelite da dodate jos jednog polaznika?","Dodavanje polaznika",
+        int izbor = JOptionPane.showOptionDialog(this,"Uspesno dodat polaznik."
+                + " Da li zelite da dodate jos jednog polaznika?","Dodavanje polaznika",
                 JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
         
+        st.close();
         if(izbor == JOptionPane.NO_OPTION){
             this.dispose();
         }
-        st.close();
+        else{
+            txtIme.setText("");
+            txtPrezime.setText("");
+            txtBrTel.setText("");
+            txtEmail.setText("");
+            txtDatumRodj.setCalendar(null);
+            cmbInstruktori.setSelectedItem(null);
+            cmbKategorija.setSelectedItem(null);
+            
+        
+        }
+    }
+    protected Polaznik vratiPolaznika(){
+        Polaznik p = new Polaznik(polaznikId, txtIme.getText(), 
+                txtPrezime.getText(), txtEmail.getText(), txtBrTel.getText(), 
+                txtDatumRodj.getDate(), (Kategorija) cmbKategorija.getSelectedItem());
+        
+        return p;
     }
 }

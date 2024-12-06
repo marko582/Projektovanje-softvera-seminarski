@@ -20,9 +20,10 @@ public class StavkaEvidencijeCasa {
     private Integer trajanjeCasa;
     private Integer cenaCasa;
     private String komentar;
+    private String status="zakazan";
     private PlanObuke planObuke;
 
-    public StavkaEvidencijeCasa(Long id, Long rb, Date datumCasa, LocalTime vremePocetkaCasa, LocalTime vremeKrajaCasa, Integer trajanjeCasa, Integer cenaCasa, String komentar, PlanObuke planObuke) {
+    public StavkaEvidencijeCasa(Long id, Long rb, Date datumCasa, LocalTime vremePocetkaCasa, LocalTime vremeKrajaCasa, Integer trajanjeCasa, Integer cenaCasa, String komentar, String status, PlanObuke planObuke) {
         this.id = id;
         this.rb = rb;
         this.datumCasa = datumCasa;
@@ -31,8 +32,18 @@ public class StavkaEvidencijeCasa {
         this.trajanjeCasa = trajanjeCasa;
         this.cenaCasa = cenaCasa;
         this.komentar = komentar;
+        this.status = status;
         this.planObuke = planObuke;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
 
 

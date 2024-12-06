@@ -17,7 +17,7 @@ import java.sql.*;
 public class KontrolerInstruktor {
     public static List<Instruktor> getList() throws SQLException{ 
         List<Instruktor> lista = new LinkedList<>();
-        String query = "SELECT * FROM instruktor";
+        String query = "SELECT * FROM instruktor WHERE status='zaposlen'";
         Connection conn = DatabaseConnection.getInstance();
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(query);

@@ -17,6 +17,7 @@ public class Instruktor {
     private String email;
     private String korisnickoIme;
     private String lozinka;
+    private String status="zaposlen";
 
     public Instruktor(Long id, String ime, String prezime, String email, String korisnickoIme, String lozinka) {
         this.id = id;
@@ -26,6 +27,16 @@ public class Instruktor {
         this.korisnickoIme = korisnickoIme;
         this.lozinka = lozinka;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+
 
     public Long getId() {
         return id;

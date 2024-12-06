@@ -199,5 +199,10 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
         if(izbor == JOptionPane.NO_OPTION){
             this.dispose();
         }
+        else{
+            txtNaziv.setText("");
+            txtOpis.setText("");
+            txtTrajanje.setText("");
+        }
     }
 }

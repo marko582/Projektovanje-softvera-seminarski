@@ -48,6 +48,7 @@ public class Login extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         setPreferredSize(new java.awt.Dimension(320, 365));
         setSize(new java.awt.Dimension(320, 365));
         getContentPane().setLayout(new java.awt.GridBagLayout());

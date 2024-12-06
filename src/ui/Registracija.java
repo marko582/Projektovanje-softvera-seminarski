@@ -12,10 +12,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import jdk.jfr.Timestamp;
 import kontroleri.KontrolerInstruktor;
 
 /**
@@ -51,19 +55,18 @@ public class Registracija extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        txtLozinka = new javax.swing.JPasswordField();
-        jLabel6 = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
         txtIme = new javax.swing.JTextField();
         txtKorisnickoIme = new javax.swing.JTextField();
+        lblEmail = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(320, 465));
         setResizable(false);
         setSize(new java.awt.Dimension(320, 465));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         btnRegistracija.setText("Registrujte se");
+        btnRegistracija.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnRegistracija.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRegistracijaActionPerformed(evt);
@@ -133,23 +136,6 @@ public class Registracija extends javax.swing.JFrame {
         getContentPane().add(jLabel5, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 13;
-        gridBagConstraints.ipadx = 169;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 59, 0, 56);
-        getContentPane().add(txtLozinka, gridBagConstraints);
-
-        jLabel6.setText("Lozinka:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 59, 0, 0);
-        getContentPane().add(jLabel6, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 13;
         gridBagConstraints.ipadx = 169;
@@ -173,12 +159,40 @@ public class Registracija extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(6, 59, 0, 56);
         getContentPane().add(txtKorisnickoIme, gridBagConstraints);
 
+        lblEmail.setForeground(new java.awt.Color(255, 0, 0));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 7;
+        getContentPane().add(lblEmail, gridBagConstraints);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistracijaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistracijaActionPerformed
         try {
-            kreirajInstruktora();
+            String greska="";
+            
+            if(validateEmail(txtEmail.getText())
+                &&txtKorisnickoIme.getText().length()>2 && !txtIme.getText().equals("") && !txtPrezime.getText().equals("")){
+                System.out.println("radi");
+                kreirajInstruktora();
+            }
+            if(txtIme.getText().equals("")){
+                greska+="Ime je prazno.\n";
+            }
+            if(txtPrezime.getText().equals("")){
+                greska+="Prezime je prazno.\n";
+            }
+            if(txtKorisnickoIme.getText().length()<3){
+                greska+="Korisnicko ime mora da sadrzi minimum 3 karaktera.\n";
+            }
+            if(!validateEmail(txtEmail.getText())){
+                greska+="Email nije u odgovarajucem formatu.\n";
+            }
+
+            if(!greska.equals(""))
+                JOptionPane.showMessageDialog(null, greska,"Greska",JOptionPane.ERROR_MESSAGE);    
+            
         } catch (SQLException ex) {
             Logger.getLogger(Registracija.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -193,41 +207,77 @@ public class Registracija extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel lblEmail;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtIme;
     private javax.swing.JTextField txtKorisnickoIme;
-    private javax.swing.JPasswordField txtLozinka;
     private javax.swing.JTextField txtPrezime;
     // End of variables declaration//GEN-END:variables
 
     private void kreirajInstruktora() throws SQLException {
         List<Instruktor> instruktori = KontrolerInstruktor.getList();
-        Boolean postoji = false;
+        Boolean postojiKorisnickoIme = false;
         for(Instruktor i : instruktori){
             if(i.getKorisnickoIme().equals(txtKorisnickoIme.getText())){
-                postoji=true;
+                postojiKorisnickoIme=true;
             }
         }
-        if(postoji){
+        if(postojiKorisnickoIme){
             JOptionPane.showMessageDialog(null, "Korisnicko ime vec postoji","Greska",JOptionPane.ERROR_MESSAGE);
         }
         else{
-            JOptionPane.showMessageDialog(null, "Uspesno ste se registrovali","",JOptionPane.INFORMATION_MESSAGE);
             Connection conn = DatabaseConnection.getInstance();
-            String query="INSERT INTO instruktor (ime,prezime,email,korisnickoIme,lozinka) VALUES (?,?,?,?,?)";
+            String query="INSERT INTO instruktor (ime,prezime,email,korisnickoIme,lozinka,datumIvremeRegistracije) "
+                    + "VALUES (?,?,?,?,?,?)";
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, txtIme.getText());
             ps.setString(2, txtPrezime.getText());
             ps.setString(3, txtEmail.getText());
             ps.setString(4, txtKorisnickoIme.getText());
-            ps.setString(5, txtLozinka.getText());
+            String generisanaLozinka = generatorLozinke(15); 
+//            System.out.println(generisanaLozinka);
+            ps.setString(5, generisanaLozinka);
+            ps.setTimestamp(6,new java.sql.Timestamp(System.currentTimeMillis()));
             ps.executeUpdate();
             ps.close();
-            
-            this.dispose();
+            email.EmailSender.posaljiEmail(txtEmail.getText(), generisanaLozinka);
+            JOptionPane.showMessageDialog(null, "Uspesno ste se registrovali","",JOptionPane.INFORMATION_MESSAGE);
+                        this.dispose();
             new Login().setVisible(true);
+            
+             //saljemo na mail
+             
+             
+
         }
 
     }
+    public boolean validateEmail(String email){
+        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
+    
+    public String generatorLozinke(int duzina) 
+    { 
+        String velikaSlova = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
+        String malaSlova = "abcdefghijklmnopqrstuvwxyz"; 
+        String brojevi = "0123456789"; 
+        String specijalniKarakteri = "!@#$%^&*_=+-/.?<>()"; 
+  
+  
+        String karakteri = velikaSlova + malaSlova + brojevi + specijalniKarakteri; 
+  
+        Random random = new Random(); 
+  
+        char[] lozinka = new char[duzina]; 
+  
+        for (int i = 0; i < duzina; i++) 
+        { 
+            lozinka[i] = karakteri.charAt(random.nextInt(karakteri.length()));
+        } 
+        String lozinkaS = new String(lozinka);
+        return lozinkaS; 
+    } 
 }
