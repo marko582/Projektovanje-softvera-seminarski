@@ -46,6 +46,7 @@ public class Glavna extends javax.swing.JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     Instruktor i;
+    Long rb=0l;
     public Glavna(Instruktor i) throws SQLException{
         initComponents();
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -81,7 +82,7 @@ public class Glavna extends javax.swing.JFrame {
         while(rs.next()){
             StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
                 (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(), 
-                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), rs.getInt("cenaCasa"), 
+                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), 
                 rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
 
             stavke.add(stavka);
@@ -362,6 +363,11 @@ public class Glavna extends javax.swing.JFrame {
         btnIzmeniCas.setText("Omoguci izmenu");
         btnIzmeniCas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnIzmeniCas.setPreferredSize(new java.awt.Dimension(250, 45));
+        btnIzmeniCas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIzmeniCasActionPerformed(evt);
+            }
+        });
         jPanel6.add(btnIzmeniCas);
 
         jPanel5.add(jPanel6);
@@ -418,27 +424,28 @@ public class Glavna extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-//        try {
-//            DodavanjePolaznika dpf = new DodavanjePolaznika(this, true);
-//            dpf.setVisible(true);
-//            dpf.addWindowListener(new WindowAdapter() {
-//                @Override
-//                public void windowClosed(WindowEvent e) {
-//                    refreshMain();
-//                }
-//            });
-//        } catch (SQLException ex) {
-//            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
         try {
-           DodavanjePolaznika dpf= new DodavanjePolaznika(this, true);
-           dpf.setVisible(true);
-           Polaznik pol = dpf.vratiPolaznika();
-           cmbPolaznik.addItem(pol);
+            DodavanjePolaznika dpf = new DodavanjePolaznika(this, true);
+            dpf.setVisible(true);
+            dpf.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    refreshMainCmb();
+                }
+            });
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+//        try {
+//           DodavanjePolaznika dpf= new DodavanjePolaznika(this, true);
+//           dpf.setVisible(true);
+//           Polaznik pol = dpf.vratiPolaznika();
+//           cmbPolaznik.addItem(pol);
+//
+//        } catch (SQLException ex) {
+//            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
 //        try {
 //           DpParametar dpp= new DpParametar(this, true);
@@ -540,7 +547,7 @@ public class Glavna extends javax.swing.JFrame {
             while(rs.next()){
                 StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
                         (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(),
-                                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), rs.getInt("cenaCasa"),
+                                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"),
                                 rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
                 
                 stavke.add(stavka);
@@ -558,9 +565,12 @@ public class Glavna extends javax.swing.JFrame {
             rs.next();
             Integer cenaObuke=rs.getInt(1);
             txtCenaObuke.setText(String.valueOf(cenaObuke));
+
             
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch(NullPointerException e){
         }
     }//GEN-LAST:event_cmbPolaznikActionPerformed
 
@@ -611,10 +621,6 @@ public class Glavna extends javax.swing.JFrame {
         }
       }
     }//GEN-LAST:event_btnObrisiCasActionPerformed
-
-    private void tblCasoviMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCasoviMouseClicked
-        btnObrisiCas.setEnabled(true);
-    }//GEN-LAST:event_tblCasoviMouseClicked
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
         try {
@@ -708,8 +714,38 @@ public class Glavna extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void btnDodajCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDodajCasActionPerformed
-        new DodavanjeCasova(this, true).setVisible(true);
+        TableModel tm = tblCasovi.getModel();
+        DefaultTableModel dtm =(DefaultTableModel) tm;
+        rb=Long.valueOf(dtm.getRowCount());
+        try {
+            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            DodavanjeCasova dcf = new DodavanjeCasova(this, true, i, p, rb);
+            dcf.setVisible(true);
+            dcf.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    try {
+                        refreshMainTable();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_btnDodajCasActionPerformed
+
+    private void btnIzmeniCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmeniCasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnIzmeniCasActionPerformed
+
+    private void tblCasoviMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCasoviMouseClicked
+        // TODO add your handling code here:
+        btnObrisiCas.setEnabled(true);
+    }//GEN-LAST:event_tblCasoviMouseClicked
 
 
 
@@ -761,9 +797,9 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JTextField txtPrezime;
     // End of variables declaration//GEN-END:variables
 
-    public void refreshMain(){
-//        cmbPolaznik.removeAllItems();
-//        napuniCmbPolaznici();
+    public void refreshMainCmb(){
+        cmbPolaznik.removeAllItems();
+        napuniCmbPolaznici();
         
     }
     
@@ -781,6 +817,19 @@ public class Glavna extends javax.swing.JFrame {
     
     protected void setData(String selection) {
         lblIzmenaLozinke.setText(selection);
+    }
+    
+    public void refreshMainTable() throws SQLException{
+        TableModel tm = tblCasovi.getModel();
+        DefaultTableModel dtm =(DefaultTableModel) tm;
+        dtm.setRowCount(0);
+        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+        List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
+        for(StavkaEvidencijeCasa s: stavke){
+            Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
+                s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
+            dtm.addRow(red);
+        }
     }
 
 }

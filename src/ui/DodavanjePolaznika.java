@@ -246,8 +246,6 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
             txtDatumRodj.setCalendar(null);
             cmbInstruktori.setSelectedItem(null);
             cmbKategorija.setSelectedItem(null);
-            
-        
         }
     }
     protected Polaznik vratiPolaznika(){
