@@ -31,11 +31,7 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(this);
-        
-        List<PlanObuke> planovi = KontrolerPlanObuke.getList();
-        for (PlanObuke po : planovi){
-            cmbPlanObuke.addItem(po);
-        }
+        napuniCmbPlanovi();
     }
 
     /**
@@ -60,7 +56,7 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
         txtNaziv = new javax.swing.JTextField();
         cmbPlanObuke = new javax.swing.JComboBox<>();
         jPanel4 = new javax.swing.JPanel();
-        btnPromeni = new javax.swing.JButton();
+        btnPromeniPlan = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(234, 500));
         setPreferredSize(new java.awt.Dimension(739, 500));
@@ -147,10 +143,10 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
         jPanel4.setPreferredSize(new java.awt.Dimension(739, 100));
         jPanel4.setLayout(new java.awt.GridBagLayout());
 
-        btnPromeni.setText("Promeni");
-        btnPromeni.addActionListener(new java.awt.event.ActionListener() {
+        btnPromeniPlan.setText("Promeni");
+        btnPromeniPlan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPromeniActionPerformed(evt);
+                btnPromeniPlanActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -160,25 +156,25 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
         gridBagConstraints.ipady = 25;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(20, 152, 32, 163);
-        jPanel4.add(btnPromeni, gridBagConstraints);
+        jPanel4.add(btnPromeniPlan, gridBagConstraints);
 
         getContentPane().add(jPanel4);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnPromeniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPromeniActionPerformed
+    private void btnPromeniPlanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPromeniPlanActionPerformed
         try {
             izmeniPlanObuke();
         } catch (SQLException ex) {
             Logger.getLogger(IzmenaPlanaObuke.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btnPromeniActionPerformed
+    }//GEN-LAST:event_btnPromeniPlanActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnPromeni;
+    private javax.swing.JButton btnPromeniPlan;
     private javax.swing.JComboBox<PlanObuke> cmbPlanObuke;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -193,23 +189,27 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
     private javax.swing.JTextField txtTrajanje;
     // End of variables declaration//GEN-END:variables
 
-        private void izmeniPlanObuke() throws SQLException {
+    private void izmeniPlanObuke() throws SQLException {
         PlanObuke po = (PlanObuke) cmbPlanObuke.getSelectedItem();
         Object[] opcije = {"Da", "Ne"};
         int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da izmenite plan obuke ?","Plan obuke",
             JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
-
-        
-        
             if(izbor == JOptionPane.YES_OPTION){
                 Connection conn = DatabaseConnection.getInstance();
                 Statement st = conn.createStatement();
                 String query = "UPDATE planobuke SET naziv='"+txtNaziv.getName()+"'" +",opis='"+po.getOpis()
-                        +"', trajanje="+po.getTrajanje()+ " WHERE id="+po.getId();
+                        +"' WHERE id="+po.getId();
                 st.executeUpdate(query);
                 st.close();
                 JOptionPane.showMessageDialog(null, "Plan obuke uspesno izmenjen.","Izmena plan obuke",JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             }
+    }
+
+    private void napuniCmbPlanovi() throws SQLException {
+        List<PlanObuke> planovi = KontrolerPlanObuke.getList();
+        for (PlanObuke po : planovi){
+            cmbPlanObuke.addItem(po);
+        }
     }
 }

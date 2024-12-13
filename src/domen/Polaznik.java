@@ -20,6 +20,10 @@ public class Polaznik {
     private String status="upisan";
     private Kategorija kategorija;
 
+    public Polaznik() {
+    }
+    
+
     public Polaznik(Long id, String ime, String prezime, String email, String brojTelefona, Date datumRodjenja, Kategorija kategorija) {
         this.id = id;
         this.ime = ime;

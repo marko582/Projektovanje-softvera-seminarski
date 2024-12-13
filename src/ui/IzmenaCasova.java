@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,27 +31,27 @@ import kontroleri.KontrolerStavke;
  *
  * @author Windows HD
  */
-public class DodavanjeCasova extends javax.swing.JDialog {
+public class IzmenaCasova extends javax.swing.JDialog {
 
     /**
      * Creates new form DodavanjeCasova
      */
-    public DodavanjeCasova(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
-        initComponents();
-        this.setLocationRelativeTo(null);
-    }
+    
     List<StavkaEvidencijeCasa> casovi = new ArrayList<StavkaEvidencijeCasa>();
     Instruktor i;
     Polaznik p;
-    Long rb;
-    public DodavanjeCasova(java.awt.Frame parent, boolean modal,Instruktor i, Polaznik p,Long rb) throws SQLException {
+    StavkaEvidencijeCasa cas;
+    public IzmenaCasova(java.awt.Frame parent, boolean modal,Instruktor i, Polaznik p,StavkaEvidencijeCasa cas) throws SQLException {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(null);
         this.i=i;
         this.p=p;
-        this.rb=rb;
+        this.cas=cas;
+        dtcDatum.setDate(cas.getDatumCasa());
+        tmpPocetak.setTime(cas.getVremePocetkaCasa());
+        tmpKraj.setTime(cas.getVremeKrajaCasa());
+        txtKomentar.setText(cas.getKomentar());
         napuniCmbPlanovi();
     }
 
@@ -68,7 +67,6 @@ public class DodavanjeCasova extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -81,24 +79,19 @@ public class DodavanjeCasova extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtKomentar = new javax.swing.JTextArea();
         cmbPlanRada = new javax.swing.JComboBox<>();
-        jPanel5 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblCasovi = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
-        btnDodajJos = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(150, 0), new java.awt.Dimension(0, 0));
-        btnKraj = new javax.swing.JButton();
+        btnIzmeniCas = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(1000, 600));
-        setMinimumSize(new java.awt.Dimension(1000, 600));
-        setPreferredSize(new java.awt.Dimension(1000, 600));
+        setMaximumSize(new java.awt.Dimension(600, 600));
+        setMinimumSize(new java.awt.Dimension(600, 600));
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
 
-        jPanel1.setMinimumSize(new java.awt.Dimension(150, 50));
-        jPanel1.setPreferredSize(new java.awt.Dimension(150, 50));
+        jPanel1.setMaximumSize(new java.awt.Dimension(600, 100));
+        jPanel1.setMinimumSize(new java.awt.Dimension(600, 100));
+        jPanel1.setPreferredSize(new java.awt.Dimension(600, 100));
 
-        jLabel6.setText("Dodavanje casova");
+        jLabel6.setText("Izmena casova");
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -124,11 +117,9 @@ public class DodavanjeCasova extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1);
 
-        jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.LINE_AXIS));
-
-        jPanel2.setMaximumSize(new java.awt.Dimension(500, 300));
-        jPanel2.setMinimumSize(new java.awt.Dimension(500, 300));
-        jPanel2.setPreferredSize(new java.awt.Dimension(500, 300));
+        jPanel2.setMaximumSize(new java.awt.Dimension(600, 400));
+        jPanel2.setMinimumSize(new java.awt.Dimension(600, 400));
+        jPanel2.setPreferredSize(new java.awt.Dimension(600, 400));
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
         jPanel2Layout.columnWidths = new int[] {0, 15, 0};
         jPanel2Layout.rowHeights = new int[] {0, 15, 0, 15, 0, 15, 0, 15, 0};
@@ -218,127 +209,54 @@ public class DodavanjeCasova extends javax.swing.JDialog {
         gridBagConstraints.gridy = 8;
         jPanel2.add(cmbPlanRada, gridBagConstraints);
 
-        jPanel4.add(jPanel2);
-
-        jPanel5.setMaximumSize(new java.awt.Dimension(500, 300));
-        jPanel5.setMinimumSize(new java.awt.Dimension(500, 300));
-        jPanel5.setPreferredSize(new java.awt.Dimension(500, 300));
-
-        tblCasovi.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Datum casa", "Vreme pocetka", "Vreme kraja", "Trajanje", "Plan rada"
-            }
-        ));
-        jScrollPane2.setViewportView(tblCasovi);
-
-        jPanel5.add(jScrollPane2);
-
-        jPanel4.add(jPanel5);
-
-        getContentPane().add(jPanel4);
+        getContentPane().add(jPanel2);
 
         jPanel3.setMinimumSize(new java.awt.Dimension(150, 100));
         jPanel3.setPreferredSize(new java.awt.Dimension(150, 100));
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
 
-        btnDodajJos.setText("Dodaj jos");
-        btnDodajJos.setPreferredSize(new java.awt.Dimension(150, 50));
-        btnDodajJos.addActionListener(new java.awt.event.ActionListener() {
+        btnIzmeniCas.setText("Izmeni");
+        btnIzmeniCas.setMaximumSize(new java.awt.Dimension(150, 30));
+        btnIzmeniCas.setMinimumSize(new java.awt.Dimension(150, 30));
+        btnIzmeniCas.setPreferredSize(new java.awt.Dimension(150, 30));
+        btnIzmeniCas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDodajJosActionPerformed(evt);
+                btnIzmeniCasActionPerformed(evt);
             }
         });
-        jPanel3.add(btnDodajJos);
-        jPanel3.add(filler1);
-
-        btnKraj.setText("Kraj dodavanja");
-        btnKraj.setPreferredSize(new java.awt.Dimension(150, 50));
-        btnKraj.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnKrajActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnKraj);
+        jPanel3.add(btnIzmeniCas);
 
         getContentPane().add(jPanel3);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnDodajJosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDodajJosActionPerformed
+    private void btnIzmeniCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmeniCasActionPerformed
         try {
-            if(!validacijaDodajCas()){
-                JOptionPane.showMessageDialog(this, "Svi podaci moraju biti uneti u ispravnom formatu","",JOptionPane.INFORMATION_MESSAGE);
-            }
-            else{
-                
             Connection conn = DatabaseConnection.getInstance();
-            Long id=0l;
-            String query="SELECT id FROM evidencijacasa WHERE idInstruktor="+i.getId()+" AND idPolaznika="+p.getId();
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            rs.next();
-            id=rs.getLong(1);
-            LocalTime t1 = tmpPocetak.getTime();
-            LocalTime t2 = tmpKraj.getTime();
-            Integer trajanje = Integer.valueOf(String.valueOf(Duration.between(t1, t2).toMinutes()));
-            rb++;
-            StavkaEvidencijeCasa cas = new StavkaEvidencijeCasa(id, rb, dtcDatum.getDate(), 
-                    t1, t2, trajanje, txtKomentar.getText(), "zakazan", (PlanObuke)cmbPlanRada.getSelectedItem());
-                    
-            casovi.add(cas);
-            
-            TableModel tm = tblCasovi.getModel();
-            DefaultTableModel dtm = (DefaultTableModel) tm;
-            dtm.setRowCount(0);
-            for(StavkaEvidencijeCasa s: casovi){
-                Object[] red = new Object[]{s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
-                  s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
-                dtm.addRow(red);
-            }
-         }
-        } catch (SQLException ex) {
-            Logger.getLogger(DodavanjeCasova.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }//GEN-LAST:event_btnDodajJosActionPerformed
-
-    private void btnKrajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKrajActionPerformed
-        try {
-            Connection conn = DatabaseConnection.getInstance();
-            for(StavkaEvidencijeCasa cas: casovi){
-                String query="INSERT INTO stavkaevidencijecasa" +
-                "(id, rb, datumCasa, vremePocetkaCasa, vremeKrajaCasa,trajanjeCasa, komentar, idPlanObuke)" +
-                "VALUES (?,?,?,?,?,?,?,?);";
-                PreparedStatement ps = conn.prepareStatement(query);
-                ps.setLong(1, cas.getId());
-                ps.setLong(2, cas.getRb());
-                ps.setDate(3, new java.sql.Date(cas.getDatumCasa().getTime()));
-                ps.setTime(4, Time.valueOf(cas.getVremePocetkaCasa()));
-                ps.setTime(5, Time.valueOf(cas.getVremeKrajaCasa()));
-                ps.setInt(6, Integer.valueOf(String.valueOf(Duration.between(cas.getVremePocetkaCasa(),cas.getVremeKrajaCasa() ).toMinutes())));
-                ps.setString(7, cas.getKomentar());
-                ps.setLong(8, cas.getPlanObuke().getId());
-                ps.executeUpdate();
-                ps.close();
-            }
+            String query = "UPDATE stavkaevidencijecasa SET datumCasa ='"+new java.sql.Date(dtcDatum.getDate().getTime())+"',"+
+            "vremePocetkaCasa='"+tmpPocetak.getTime() +"'," +
+            "vremeKrajaCasa='"+tmpKraj.getTime()+"'," +
+            "trajanjeCasa='"+Integer.valueOf(String.valueOf(Duration.between(tmpPocetak.getTime(), tmpKraj.getTime()).toMinutes()))+"', " +
+            "komentar='"+txtKomentar.getText()+"'," +
+            "idPlanObuke='"+((PlanObuke)cmbPlanRada.getSelectedItem()).getId()+"' WHERE id="+
+                    cas.getId()+" AND rb="+cas.getRb();
+            st.executeUpdate(query);
+            JOptionPane.showMessageDialog(null, "Cas uspesno izmenjen.","Izmena casa",JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
-        } catch (SQLException ex) {            
-            Logger.getLogger(DodavanjeCasova.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(IzmenaCasova.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btnKrajActionPerformed
+    }//GEN-LAST:event_btnIzmeniCasActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDodajJos;
-    private javax.swing.JButton btnKraj;
+    private javax.swing.JButton btnIzmeniCas;
     private javax.swing.JComboBox<PlanObuke> cmbPlanRada;
     private com.toedter.calendar.JDateChooser dtcDatum;
-    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel6;
@@ -348,11 +266,7 @@ public class DodavanjeCasova extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable tblCasovi;
     private com.github.lgooddatepicker.components.TimePicker tmpKraj;
     private com.github.lgooddatepicker.components.TimePicker tmpPocetak;
     private javax.swing.JTextArea txtKomentar;
@@ -363,13 +277,6 @@ public class DodavanjeCasova extends javax.swing.JDialog {
         for (PlanObuke plan: planovi){
             cmbPlanRada.addItem(plan);
         }
-    }
-
-    private boolean validacijaDodajCas() {
-        if(dtcDatum.getDate()!=null && tmpPocetak.getTime()!=null && tmpKraj.getTime()!=null
-                && !txtKomentar.getText().equals("")){
-            return true;
-        }
-        return false;
+        cmbPlanRada.setSelectedItem(cas.getPlanObuke());
     }
 }

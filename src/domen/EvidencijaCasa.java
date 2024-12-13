@@ -16,6 +16,10 @@ public class EvidencijaCasa {
     private Instruktor instruktor;
     private Polaznik polaznik;
 
+    public EvidencijaCasa() {
+    }
+
+    
     public EvidencijaCasa(Long id, Integer ukupnaCena, Instruktor instruktor, Polaznik polaznik, List<StavkaEvidencijeCasa> stavke) {
         this.id = id;
         this.ukupnaCena = ukupnaCena;

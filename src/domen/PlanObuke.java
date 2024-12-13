@@ -12,13 +12,15 @@ public class PlanObuke {
     private Long id;
     private String naziv;
     private String opis;
-    private Integer trajanje;
 
-    public PlanObuke(Long id, String naziv, String opis, Integer trajanje) {
+    public PlanObuke() {
+    }
+    
+
+    public PlanObuke(Long id, String naziv, String opis) {
         this.id = id;
         this.naziv = naziv;
         this.opis = opis;
-        this.trajanje = trajanje;
     }
 
     public Long getId() {
@@ -43,14 +45,6 @@ public class PlanObuke {
 
     public void setOpis(String opis) {
         this.opis = opis;
-    }
-
-    public Integer getTrajanje() {
-        return trajanje;
-    }
-
-    public void setTrajanje(Integer trajanje) {
-        this.trajanje = trajanje;
     }
 
     @Override

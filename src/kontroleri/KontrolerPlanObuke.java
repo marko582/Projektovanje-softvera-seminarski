@@ -20,13 +20,13 @@ import java.util.List;
 public class KontrolerPlanObuke {
         public static List<PlanObuke> getList() throws SQLException{
         List<PlanObuke> lista = new LinkedList<>();
-        String query = "SELECT id,naziv,opis,trajanje FROM planobuke";
+        String query = "SELECT id,naziv,opis FROM planobuke";
         Connection conn = DatabaseConnection.getInstance();
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(query);
         
         while(rs.next()){
-            PlanObuke po = new PlanObuke(rs.getLong("id"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje"));
+            PlanObuke po = new PlanObuke(rs.getLong("id"), rs.getString("naziv"), rs.getString("opis"));
             lista.add(po);
         }
         rs.close();

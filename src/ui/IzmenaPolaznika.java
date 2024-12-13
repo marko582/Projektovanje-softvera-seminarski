@@ -32,25 +32,15 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
     /**
      * Creates new form IzmenaPolaznika
      */
+    Instruktor ins;
     public IzmenaPolaznika(java.awt.Frame parent, boolean modal, Instruktor ins) throws SQLException {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(null);
-                
-        List<Polaznik> polaznici = KontrolerPolaznik.getList();
-        for(Polaznik p : polaznici){
-            cmbPolaznik.addItem(p);
-        }
-        List<Kategorija> kategorije = KontrolerKategorija.getList();
-        for (Kategorija k : kategorije){
-            cmbKategorija.addItem(k);
-        }
-        List<Instruktor> instruktori = KontrolerInstruktor.getList();
-        for (Instruktor i : instruktori){
-            cmbInstruktori.addItem(i);
-        }
-        cmbKategorija.setSelectedItem(polaznici.get(0).getKategorija());
-        cmbInstruktori.setSelectedItem(ins);
+        this.ins=ins;
+        napuniCmbKategorija();
+        napuniCmbPolaznik();
+        napuniCmbInstruktor();
     }
 
     /**
@@ -81,7 +71,7 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         cmbInstruktori = new javax.swing.JComboBox<>();
         jPanel1 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        btnIzmeniPolaznika = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(700, 600));
@@ -99,11 +89,6 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         cmbPolaznik.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbPolaznikItemStateChanged(evt);
-            }
-        });
-        cmbPolaznik.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbPolaznikActionPerformed(evt);
             }
         });
         jPanel2.add(cmbPolaznik);
@@ -167,27 +152,27 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         jPanel1.setPreferredSize(new java.awt.Dimension(859, 75));
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jButton2.setText("Promeni");
-        jButton2.setPreferredSize(new java.awt.Dimension(150, 50));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnIzmeniPolaznika.setText("Promeni");
+        btnIzmeniPolaznika.setPreferredSize(new java.awt.Dimension(150, 50));
+        btnIzmeniPolaznika.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnIzmeniPolaznikaActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new java.awt.GridBagConstraints());
+        jPanel1.add(btnIzmeniPolaznika, new java.awt.GridBagConstraints());
 
         getContentPane().add(jPanel1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnIzmeniPolaznikaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmeniPolaznikaActionPerformed
         try {
             izmeniPolaznik();
         } catch (SQLException ex) {
             Logger.getLogger(IzmenaPolaznika.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnIzmeniPolaznikaActionPerformed
 
     private void cmbPolaznikItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPolaznikItemStateChanged
         Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
@@ -199,17 +184,12 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         cmbKategorija.setSelectedItem(p.getKategorija());
     }//GEN-LAST:event_cmbPolaznikItemStateChanged
 
-    private void cmbPolaznikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPolaznikActionPerformed
-        // TODO add your handling code here:
-
-    }//GEN-LAST:event_cmbPolaznikActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnIzmeniPolaznika;
     private javax.swing.JComboBox<Instruktor> cmbInstruktori;
     private javax.swing.JComboBox<Kategorija> cmbKategorija;
     private javax.swing.JComboBox<Polaznik> cmbPolaznik;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -233,9 +213,6 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         Object[] opcije = {"Da", "Ne"};
         int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da izmenite podatke polaznika ?","Izmena polaznika",
             JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
-
-        
-        
             if(izbor == JOptionPane.YES_OPTION){
                 Connection conn = DatabaseConnection.getInstance();
                 Statement st = conn.createStatement();
@@ -255,5 +232,28 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             }
+    }
+
+    private void napuniCmbPolaznik() throws SQLException {
+        List<Polaznik> polaznici = KontrolerPolaznik.getList();
+        for(Polaznik p : polaznici){
+            cmbPolaznik.addItem(p);
+        }
+        cmbKategorija.setSelectedItem(polaznici.get(0).getKategorija());
+    }
+
+    private void napuniCmbKategorija() throws SQLException {
+        List<Kategorija> kategorije = KontrolerKategorija.getList();
+        for (Kategorija k : kategorije){
+            cmbKategorija.addItem(k);
+        }
+    }
+
+    private void napuniCmbInstruktor() throws SQLException {
+        List<Instruktor> instruktori = KontrolerInstruktor.getList();
+        for (Instruktor i : instruktori){
+            cmbInstruktori.addItem(i);
+        }
+        cmbInstruktori.setSelectedItem(ins);
     }
 }

@@ -509,11 +509,6 @@ public class NalogInstruktora extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnPromeniLozinkuActionPerformed
 
-    public boolean validateLozinka(String lozinka){
-        Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,}$", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(lozinka);
-        return matcher.matches();
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDodaj;
@@ -543,6 +538,11 @@ public class NalogInstruktora extends javax.swing.JDialog {
     private javax.swing.JTextField txtPrezime;
     private javax.swing.JPasswordField txtStaraLozinka;
     // End of variables declaration//GEN-END:variables
+
+    public boolean validateLozinka(String lozinka){
+        Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(lozinka);
+        return matcher.matches();
+    }
+
 }
-
-

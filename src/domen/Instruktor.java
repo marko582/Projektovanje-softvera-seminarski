@@ -19,6 +19,10 @@ public class Instruktor {
     private String lozinka;
     private String status="zaposlen";
 
+    public Instruktor() {
+    }
+
+    
     public Instruktor(Long id, String ime, String prezime, String email, String korisnickoIme, String lozinka) {
         this.id = id;
         this.ime = ime;

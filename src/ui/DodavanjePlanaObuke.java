@@ -42,8 +42,6 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        txtTrajanje = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtOpis = new javax.swing.JTextArea();
@@ -73,22 +71,6 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
         jPanel3Layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         jPanel3.setLayout(jPanel3Layout);
 
-        jLabel3.setText("Trajanje:");
-        jLabel3.setPreferredSize(new java.awt.Dimension(50, 16));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanel3.add(jLabel3, gridBagConstraints);
-
-        txtTrajanje.setMaximumSize(new java.awt.Dimension(300, 20));
-        txtTrajanje.setMinimumSize(new java.awt.Dimension(64, 20));
-        txtTrajanje.setPreferredSize(new java.awt.Dimension(350, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
-        jPanel3.add(txtTrajanje, gridBagConstraints);
-
         jLabel2.setText("Opis:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -98,8 +80,7 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
 
         txtOpis.setColumns(30);
         txtOpis.setRows(5);
-        txtOpis.setMinimumSize(new java.awt.Dimension(13, 150));
-        txtOpis.setPreferredSize(new java.awt.Dimension(340, 150));
+        txtOpis.setMinimumSize(new java.awt.Dimension(340, 250));
         jScrollPane1.setViewportView(txtOpis);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -150,7 +131,7 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(btnDodaj, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel4);
@@ -172,7 +153,6 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
     private javax.swing.JButton btnDodaj;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -180,16 +160,19 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField txtNaziv;
     private javax.swing.JTextArea txtOpis;
-    private javax.swing.JTextField txtTrajanje;
     // End of variables declaration//GEN-END:variables
 
-        private void dodajPlanObuke() throws SQLException {
+    private void dodajPlanObuke() throws SQLException {
+        if(!validacijaPlanObuke()){
+            JOptionPane.showMessageDialog(this, "Svi podaci moraju biti uneti u ispravnom formatu","",JOptionPane.INFORMATION_MESSAGE);
+        }
+        else{
+        
         Connection conn = DatabaseConnection.getInstance();
-        String query="INSERT INTO planobuke (naziv,opis,trajanje) VALUES (?,?,?)";
+        String query="INSERT INTO planobuke (naziv,opis) VALUES (?,?)";
         PreparedStatement ps = conn.prepareStatement(query);
         ps.setString(1, txtNaziv.getText());
         ps.setString(2, txtOpis.getText());
-        ps.setString(3, txtTrajanje.getText());
         ps.executeUpdate();
         ps.close();
         Object[] opcije = {"Da", "Ne"};
@@ -202,7 +185,14 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
         else{
             txtNaziv.setText("");
             txtOpis.setText("");
-            txtTrajanje.setText("");
         }
+      }
+    }
+
+    private boolean validacijaPlanObuke() {
+        if(!txtNaziv.getText().equals("") && !txtOpis.getText().equals("")){
+            return true;
+        }
+        return false;
     }
 }

@@ -36,7 +36,7 @@ public class KontrolerStavke {
             StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
                 (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(),
                 rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"),
-                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
+                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
 
             lista.add(stavka);
         }

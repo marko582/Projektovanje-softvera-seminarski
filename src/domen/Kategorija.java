@@ -14,6 +14,10 @@ public class Kategorija {
     private Long id;
     private String naziv;
 
+    public Kategorija() {
+    }
+    
+
     public Kategorija(Long id, String naziv) {
         this.id = id;
         this.naziv = naziv;

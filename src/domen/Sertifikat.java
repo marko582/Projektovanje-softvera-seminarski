@@ -14,6 +14,10 @@ public class Sertifikat {
     private Long id;
     private String naziv;
 
+    public Sertifikat() {
+    }
+    
+
     public Sertifikat(Long id, String naziv) {
         this.id = id;
         this.naziv = naziv;

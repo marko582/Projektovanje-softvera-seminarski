@@ -170,29 +170,7 @@ public class Registracija extends javax.swing.JFrame {
 
     private void btnRegistracijaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistracijaActionPerformed
         try {
-            String greska="";
-            
-            if(validateEmail(txtEmail.getText())
-                &&txtKorisnickoIme.getText().length()>2 && !txtIme.getText().equals("") && !txtPrezime.getText().equals("")){
-                System.out.println("radi");
-                kreirajInstruktora();
-            }
-            if(txtIme.getText().equals("")){
-                greska+="Ime je prazno.\n";
-            }
-            if(txtPrezime.getText().equals("")){
-                greska+="Prezime je prazno.\n";
-            }
-            if(txtKorisnickoIme.getText().length()<3){
-                greska+="Korisnicko ime mora da sadrzi minimum 3 karaktera.\n";
-            }
-            if(!validateEmail(txtEmail.getText())){
-                greska+="Email nije u odgovarajucem formatu.\n";
-            }
-
-            if(!greska.equals(""))
-                JOptionPane.showMessageDialog(null, greska,"Greska",JOptionPane.ERROR_MESSAGE);    
-            
+            validacijaIregistracija();
         } catch (SQLException ex) {
             Logger.getLogger(Registracija.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -235,20 +213,15 @@ public class Registracija extends javax.swing.JFrame {
             ps.setString(3, txtEmail.getText());
             ps.setString(4, txtKorisnickoIme.getText());
             String generisanaLozinka = generatorLozinke(15); 
-//            System.out.println(generisanaLozinka);
             ps.setString(5, generisanaLozinka);
             ps.setTimestamp(6,new java.sql.Timestamp(System.currentTimeMillis()));
             ps.executeUpdate();
             ps.close();
             email.EmailSender.posaljiEmail(txtEmail.getText(), generisanaLozinka);
             JOptionPane.showMessageDialog(null, "Uspesno ste se registrovali","",JOptionPane.INFORMATION_MESSAGE);
-                        this.dispose();
+            this.dispose();
             new Login().setVisible(true);
-            
-             //saljemo na mail
              
-             
-
         }
 
     }
@@ -280,4 +253,29 @@ public class Registracija extends javax.swing.JFrame {
         String lozinkaS = new String(lozinka);
         return lozinkaS; 
     } 
+
+    private void validacijaIregistracija() throws SQLException {
+                    String greska="";
+            
+            if(validateEmail(txtEmail.getText())
+                &&txtKorisnickoIme.getText().length()>2 && !txtIme.getText().equals("") && !txtPrezime.getText().equals("")){
+                System.out.println("radi");
+                kreirajInstruktora();
+            }
+            if(txtIme.getText().equals("")){
+                greska+="Ime je prazno.\n";
+            }
+            if(txtPrezime.getText().equals("")){
+                greska+="Prezime je prazno.\n";
+            }
+            if(txtKorisnickoIme.getText().length()<3){
+                greska+="Korisnicko ime mora da sadrzi minimum 3 karaktera.\n";
+            }
+            if(!validateEmail(txtEmail.getText())){
+                greska+="Email nije u odgovarajucem formatu.\n";
+            }
+
+            if(!greska.equals(""))
+                JOptionPane.showMessageDialog(null, greska,"Greska",JOptionPane.ERROR_MESSAGE);  
+    }
 }

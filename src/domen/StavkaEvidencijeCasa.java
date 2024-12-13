@@ -22,6 +22,11 @@ public class StavkaEvidencijeCasa {
     private String status="zakazan";
     private PlanObuke planObuke;
 
+    public StavkaEvidencijeCasa() {
+    }
+
+    
+    
     public StavkaEvidencijeCasa(Long id, Long rb, Date datumCasa, LocalTime vremePocetkaCasa, LocalTime vremeKrajaCasa, Integer trajanjeCasa, String komentar, String status, PlanObuke planObuke) {
         this.id = id;
         this.rb = rb;

@@ -23,8 +23,6 @@ public class EmailSender {
     
     String from = "mijailovicm30@gmail.com";
     String appPassword ="vylf egur qvmz tnuk";
-      
-//    email = "markomijailovic03@gmail.com";
 
     String host = "smtp.gmail.com";
     Properties properties = new Properties();

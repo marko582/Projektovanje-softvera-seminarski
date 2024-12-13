@@ -11,6 +11,8 @@ import java.sql.*;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import kontroleri.KontrolerInstruktor;
 import kontroleri.KontrolerKategorija;
@@ -29,16 +31,8 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(this);
-        List<Kategorija> kategorije = KontrolerKategorija.getList();
-        for (Kategorija k : kategorije){
-            cmbKategorija.addItem(k);
-        }
-        List<Instruktor> instruktori = KontrolerInstruktor.getList();
-        for (Instruktor i : instruktori){
-            cmbInstruktori.addItem(i);
-        }
-        cmbInstruktori.setSelectedItem(null);
-        cmbKategorija.setSelectedItem(null);
+        napuniCmbKategorija();
+        napuniCmbInstruktor();
     }
 
     /**
@@ -68,7 +62,7 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         cmbInstruktori = new javax.swing.JComboBox<>();
         jPanel4 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        btnDodajPolaznika = new javax.swing.JButton();
 
         setMaximumSize(new java.awt.Dimension(2147483647, 500));
         setPreferredSize(new java.awt.Dimension(800, 450));
@@ -140,10 +134,10 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         jPanel4.setMaximumSize(new java.awt.Dimension(32767, 100));
         jPanel4.setPreferredSize(new java.awt.Dimension(739, 100));
 
-        jButton2.setText("Dodaj");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnDodajPolaznika.setText("Dodaj");
+        btnDodajPolaznika.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnDodajPolaznikaActionPerformed(evt);
             }
         });
 
@@ -153,14 +147,14 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(274, 274, 274)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDodajPolaznika, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(290, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap(34, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDodajPolaznika, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
         );
 
@@ -169,20 +163,20 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnDodajPolaznikaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDodajPolaznikaActionPerformed
         try {
             dodajPolaznika();
         } catch (SQLException ex) {
             Logger.getLogger(DodavanjePolaznika.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnDodajPolaznikaActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDodajPolaznika;
     private javax.swing.JComboBox<Instruktor> cmbInstruktori;
     private javax.swing.JComboBox<Kategorija> cmbKategorija;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -202,7 +196,11 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     private void dodajPolaznika() throws SQLException {
-        Connection conn = DatabaseConnection.getInstance();
+        if(!validacijaDodajPolaznik()){
+            JOptionPane.showMessageDialog(this, "Svi podaci moraju biti uneti u ispravnom formatu","",JOptionPane.INFORMATION_MESSAGE);
+        }
+        else{
+            Connection conn = DatabaseConnection.getInstance();
         String query="INSERT INTO polaznik (ime,prezime,email,brojTelefona,datumRodjenja,idKategorija) VALUES (?,?,?,?,?,?)";
         PreparedStatement ps = conn.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS);
         Long idKategorija=0l;
@@ -224,11 +222,48 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         Long idPolaznik=rs.getLong(1);
         this.polaznikId=idPolaznik;
         ps.close();
+        
+        Integer cenaObuke=0;
+        switch (Long.valueOf(idKategorija).intValue()) {
+            case 1:
+                cenaObuke=67500;
+                break;
+            case 2:
+                cenaObuke=70000;
+                break;
+            case 3:
+                cenaObuke=72500;
+                break;
+            case 4:
+                cenaObuke=75000;
+                break;
+            case 5:
+                cenaObuke=80000;
+                break;
+            case 6:
+                cenaObuke=82500;
+                break;
+            case 7:
+                cenaObuke=85000;
+                break;
+            case 8:
+                cenaObuke=87500;
+                break;
+            case 9:
+                cenaObuke=90000;
+                break;
+            default:
+                throw new AssertionError();
+        }
+        
         Instruktor instruktor = (Instruktor) cmbInstruktori.getSelectedItem();
-        String query3="INSERT INTO evidencijacasa (idInstruktor,idPolaznika) VALUES ("+instruktor.getId()+","
-                +idPolaznik+")";
+        String query3="INSERT INTO evidencijacasa (idInstruktor,idPolaznika,ukupnaCena) VALUES ("+instruktor.getId()+","
+                +idPolaznik+","+ cenaObuke +")";
         
         st.executeUpdate(query3);
+
+        
+        
         Object[] opcije = {"Da", "Ne"};
         int izbor = JOptionPane.showOptionDialog(this,"Uspesno dodat polaznik."
                 + " Da li zelite da dodate jos jednog polaznika?","Dodavanje polaznika",
@@ -247,12 +282,38 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
             cmbInstruktori.setSelectedItem(null);
             cmbKategorija.setSelectedItem(null);
         }
-    }
-    protected Polaznik vratiPolaznika(){
-        Polaznik p = new Polaznik(polaznikId, txtIme.getText(), 
-                txtPrezime.getText(), txtEmail.getText(), txtBrTel.getText(), 
-                txtDatumRodj.getDate(), (Kategorija) cmbKategorija.getSelectedItem());
+        }
         
-        return p;
+        
+    }
+
+    private void napuniCmbKategorija() throws SQLException {
+        List<Kategorija> kategorije = KontrolerKategorija.getList();
+        for (Kategorija k : kategorije){
+            cmbKategorija.addItem(k);
+        }
+        cmbKategorija.setSelectedItem(null);
+    }
+
+    private void napuniCmbInstruktor() throws SQLException {
+        List<Instruktor> instruktori = KontrolerInstruktor.getList();
+        for (Instruktor i : instruktori){
+            cmbInstruktori.addItem(i);
+        }
+        cmbInstruktori.setSelectedItem(null);
+    }
+
+    private boolean validacijaDodajPolaznik() {
+        if(!txtIme.getText().equals("") && !txtPrezime.getText().equals("") && !txtBrTel.getText().equals("")
+                && txtDatumRodj.getDate()!=null && validateEmail(txtEmail.getText())
+                && cmbKategorija.getSelectedItem()!=null && cmbInstruktori.getSelectedItem()!=null){
+            return true;
+        }
+        return false;
+    }
+    public boolean validateEmail(String email){
+        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }

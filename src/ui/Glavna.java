@@ -14,7 +14,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ import javax.swing.table.TableModel;
 import kontroleri.KontrolerKategorija;
 import kontroleri.KontrolerPolaznik;
 import kontroleri.KontrolerStavke;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
  *
@@ -54,20 +56,12 @@ public class Glavna extends javax.swing.JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.i=i;
         lblInstruktor.setText(i.getKorisnickoIme());
+        AutoCompleteDecorator.decorate(cmbPolaznik);
         
-        List<Polaznik> polaznici = KontrolerPolaznik.getList(i);
-        for(Polaznik p : polaznici){
-            cmbPolaznik.addItem(p);
-        }
-
-        List<Kategorija> kategorije = KontrolerKategorija.getList();
-        for (Kategorija k : kategorije){
-            cmbKategorija.addItem(k);
-        }
+        napuniCmbPolaznici();
+        napuniCmbKategorija();
+        
         Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-        TableModel tm = tblCasovi.getModel();
-        DefaultTableModel dtm = (DefaultTableModel) tm;
-        dtm.setRowCount(0);
         //lista stavki
     if(p!=null){
         Connection conn = DatabaseConnection.getInstance();
@@ -83,15 +77,19 @@ public class Glavna extends javax.swing.JFrame {
             StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
                 (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(), 
                 rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), 
-                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
+                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
 
             stavke.add(stavka);
         }
+        TableModel tm = tblCasovi.getModel();
+        DefaultTableModel dtm = (DefaultTableModel) tm;
+        dtm.setRowCount(0);
         for(StavkaEvidencijeCasa s: stavke){
             Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
                 s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
             dtm.addRow(red);
         }
+        
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
         tblCasovi.setDefaultRenderer(Object.class, centerRenderer);
@@ -223,11 +221,6 @@ public class Glavna extends javax.swing.JFrame {
             }
         });
         tblCasovi.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        tblCasovi.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblCasoviMouseClicked(evt);
-            }
-        });
         jScrollPane1.setViewportView(tblCasovi);
         if (tblCasovi.getColumnModel().getColumnCount() > 0) {
             tblCasovi.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -350,7 +343,6 @@ public class Glavna extends javax.swing.JFrame {
         btnObrisiCas.setForeground(new java.awt.Color(255, 51, 51));
         btnObrisiCas.setText("Otkazi cas");
         btnObrisiCas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnObrisiCas.setEnabled(false);
         btnObrisiCas.setPreferredSize(new java.awt.Dimension(250, 45));
         btnObrisiCas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -360,7 +352,7 @@ public class Glavna extends javax.swing.JFrame {
         jPanel6.add(btnObrisiCas);
 
         btnIzmeniCas.setForeground(new java.awt.Color(0, 0, 255));
-        btnIzmeniCas.setText("Omoguci izmenu");
+        btnIzmeniCas.setText("Izmeni cas");
         btnIzmeniCas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnIzmeniCas.setPreferredSize(new java.awt.Dimension(250, 45));
         btnIzmeniCas.addActionListener(new java.awt.event.ActionListener() {
@@ -548,7 +540,7 @@ public class Glavna extends javax.swing.JFrame {
                 StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
                         (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(),
                                 rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"),
-                                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis"), rs.getInt("trajanje")));
+                                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
                 
                 stavke.add(stavka);
             }
@@ -653,52 +645,40 @@ public class Glavna extends javax.swing.JFrame {
         
             if(izbor == JOptionPane.YES_OPTION){
                 try {
-                    try {
-                        Connection conn = DatabaseConnection.getInstance();
-                        Statement st = conn.createStatement();
-                        java.util.Date datum = txtDatumRodj.getDate();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        String formatiranDatum = sdf.format(datum);
-                        String query = "UPDATE polaznik SET ime='"+txtIme.getText()+"',prezime='"+txtPrezime.getText()+
-                                "',email='"+txtEmail.getText()+"',brojTelefona='"+txtBrTel.getText()+
-                                "',datumRodjenja='"+formatiranDatum+"',idKategorija="
-                                +((Kategorija)cmbKategorija.getSelectedItem()).getId()
-                                + " WHERE id="+p.getId();
-                        st.executeUpdate(query);
-                        String query2="UPDATE evidencijacasa SET idInstruktor="+i.getId()
-                                +" WHERE idPolaznika="+p.getId();
-                        st.executeUpdate(query2);
-                        st.close();
-                        JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
-                        
-                        
-                        
-                        
-                        
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    btnIzmeniPolaznik.setText("Omoguci izmenu");
-                    txtIme.setEditable(false);
-                    txtPrezime.setEditable(false);
-                    txtBrTel.setEditable(false);
-                    txtDatumRodj.setEnabled(false);
-                    txtEmail.setEditable(false);
-                    cmbKategorija.setEnabled(false);
+                    Connection conn = DatabaseConnection.getInstance();
+                    Statement st = conn.createStatement();
+                    java.util.Date datum = txtDatumRodj.getDate();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String formatiranDatum = sdf.format(datum);
+                    String query = "UPDATE polaznik SET ime='"+txtIme.getText()+"',prezime='"+txtPrezime.getText()+
+                            "',email='"+txtEmail.getText()+"',brojTelefona='"+txtBrTel.getText()+
+                            "',datumRodjenja='"+formatiranDatum+"',idKategorija="
+                            +((Kategorija)cmbKategorija.getSelectedItem()).getId()
+                            + " WHERE id="+p.getId();
+                    st.executeUpdate(query);
+                    String query2="UPDATE evidencijacasa SET idInstruktor="+i.getId()
+                            +" WHERE idPolaznika="+p.getId();
+                    st.executeUpdate(query2);
+                    st.close();
+                    JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
                     
-                    cmbPolaznik.removeItem(p);
                     
-                    List<Polaznik> polaznici = KontrolerPolaznik.getList(i);
-                    for(Polaznik polaznik : polaznici){
-                        if(polaznik.getId().equals(p.getId())){
-                            cmbPolaznik.addItem(polaznik);
-                            
-                        }
-                    }
+                    
+                    
                     
                 } catch (SQLException ex) {
                     Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                btnIzmeniPolaznik.setText("Omoguci izmenu");
+                txtIme.setEditable(false);
+                txtPrezime.setEditable(false);
+                txtBrTel.setEditable(false);
+                txtDatumRodj.setEnabled(false);
+                txtEmail.setEditable(false);
+                cmbKategorija.setEnabled(false);
+                
+                cmbPolaznik.removeAllItems();
+                napuniCmbPolaznici();
             
        }
     }
@@ -739,13 +719,36 @@ public class Glavna extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDodajCasActionPerformed
 
     private void btnIzmeniCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmeniCasActionPerformed
-        // TODO add your handling code here:
+        try {
+            StavkaEvidencijeCasa cas=new StavkaEvidencijeCasa();
+            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            List<StavkaEvidencijeCasa> casovi = KontrolerStavke.getList(i, p);
+            int selektovanRed=tblCasovi.getSelectedRow();
+            TableModel tm = tblCasovi.getModel();
+            DefaultTableModel dtm = (DefaultTableModel) tm;
+            for(int i=0;i<dtm.getRowCount();i++){
+                if(i==selektovanRed){
+                    cas = casovi.get(i);
+                }
+            }
+            
+            
+            IzmenaCasova icf= new IzmenaCasova(this, rootPaneCheckingEnabled,i,p,cas);
+            icf.setVisible(true);
+            icf.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    try {
+                        refreshMainTable();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnIzmeniCasActionPerformed
-
-    private void tblCasoviMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCasoviMouseClicked
-        // TODO add your handling code here:
-        btnObrisiCas.setEnabled(true);
-    }//GEN-LAST:event_tblCasoviMouseClicked
 
 
 
@@ -806,6 +809,12 @@ public class Glavna extends javax.swing.JFrame {
     public void napuniCmbPolaznici(){
         try {
             List<Polaznik> polaznici = KontrolerPolaznik.getList(i);
+            Collections.sort(polaznici, new Comparator<Polaznik>() {
+            @Override
+            public int compare(Polaznik p1, Polaznik p2) {
+                return p1.getIme().compareTo(p2.getIme());
+            }
+        });
             for(Polaznik p : polaznici){
                 cmbPolaznik.addItem(p);
             }
@@ -829,6 +838,17 @@ public class Glavna extends javax.swing.JFrame {
             Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
                 s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
             dtm.addRow(red);
+        }
+    }
+
+    private void napuniCmbKategorija() {
+        try {
+            List<Kategorija> kategorije = KontrolerKategorija.getList();
+            for (Kategorija k : kategorije){
+                cmbKategorija.addItem(k);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

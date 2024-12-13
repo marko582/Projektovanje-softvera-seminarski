@@ -45,7 +45,7 @@ public class Login extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtLozinka = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
+        btnRegistracija = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -112,10 +112,10 @@ public class Login extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(6, 45, 0, 44);
         getContentPane().add(txtLozinka, gridBagConstraints);
 
-        jButton1.setText("Kreirajte nalog");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnRegistracija.setText("Kreirajte nalog");
+        btnRegistracija.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnRegistracijaActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -124,7 +124,7 @@ public class Login extends javax.swing.JFrame {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(27, 20, 23, 0);
-        getContentPane().add(jButton1, gridBagConstraints);
+        getContentPane().add(btnRegistracija, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -132,20 +132,16 @@ public class Login extends javax.swing.JFrame {
     private void btnPrijavaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrijavaActionPerformed
         String korisnickoIme = txtKorisnickoIme.getText();
         String lozinka = txtLozinka.getText();
-
         try {
             List<Instruktor> instruktori = KontrolerInstruktor.getList();
             for(Instruktor i : instruktori){
                 if(i.getKorisnickoIme().equals(korisnickoIme) && i.getLozinka().equals(lozinka)){
-                    
                     this.dispose();
                     JFrame glavna = new Glavna(i);
                     glavna.setVisible(true);
-                    
                     return;
                 }
             }
-            
             JOptionPane.showMessageDialog(null, "Korisnicko ime ili lozinka nisu ispravni","Greska",JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
@@ -155,17 +151,16 @@ public class Login extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnPrijavaActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+    private void btnRegistracijaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistracijaActionPerformed
         this.dispose();
         new Registracija().setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnRegistracijaActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPrijava;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnRegistracija;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -173,7 +168,4 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtLozinka;
     // End of variables declaration//GEN-END:variables
 
-    private String getKorisnickoImeLogin() {
-        return txtKorisnickoIme.getText();
-    }
 }
