@@ -4,13 +4,8 @@
  */
 package ui;
 
-import broker.DatabaseConnection;
 import domen.Instruktor;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -19,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import jdk.jfr.Timestamp;
 import kontroleri.KontrolerInstruktor;
 
 /**
@@ -204,24 +198,16 @@ public class Registracija extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Korisnicko ime vec postoji","Greska",JOptionPane.ERROR_MESSAGE);
         }
         else{
-            Connection conn = DatabaseConnection.getInstance();
-            String query="INSERT INTO instruktor (ime,prezime,email,korisnickoIme,lozinka,datumIvremeRegistracije) "
-                    + "VALUES (?,?,?,?,?,?)";
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, txtIme.getText());
-            ps.setString(2, txtPrezime.getText());
-            ps.setString(3, txtEmail.getText());
-            ps.setString(4, txtKorisnickoIme.getText());
-            String generisanaLozinka = generatorLozinke(15); 
-            ps.setString(5, generisanaLozinka);
-            ps.setTimestamp(6,new java.sql.Timestamp(System.currentTimeMillis()));
-            ps.executeUpdate();
-            ps.close();
+            String generisanaLozinka = generatorLozinke(15);
+            Instruktor instruktor = new Instruktor(0l, txtIme.getText(), txtPrezime.getText(), txtEmail.getText(), txtKorisnickoIme.getText(),generisanaLozinka);
+            
+            KontrolerInstruktor.create(instruktor);
+            
             email.EmailSender.posaljiEmail(txtEmail.getText(), generisanaLozinka);
             JOptionPane.showMessageDialog(null, "Uspesno ste se registrovali","",JOptionPane.INFORMATION_MESSAGE);
+            
             this.dispose();
-            new Login().setVisible(true);
-             
+            new Login().setVisible(true); 
         }
 
     }
@@ -255,7 +241,7 @@ public class Registracija extends javax.swing.JFrame {
     } 
 
     private void validacijaIregistracija() throws SQLException {
-                    String greska="";
+            String greska="";
             
             if(validateEmail(txtEmail.getText())
                 &&txtKorisnickoIme.getText().length()>2 && !txtIme.getText().equals("") && !txtPrezime.getText().equals("")){

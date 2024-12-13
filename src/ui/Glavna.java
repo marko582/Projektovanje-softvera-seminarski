@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -41,12 +40,6 @@ public class Glavna extends javax.swing.JFrame {
     /**
      * Creates new form Glavna
      */
-    public Glavna() {
-        initComponents();
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        this.setResizable(false);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
     Instruktor i;
     Long rb=0l;
     public Glavna(Instruktor i) throws SQLException{
@@ -64,23 +57,24 @@ public class Glavna extends javax.swing.JFrame {
         Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
         //lista stavki
     if(p!=null){
-        Connection conn = DatabaseConnection.getInstance();
-        String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
-        "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
-        "WHERE instruktor.id=? AND polaznik.id=? AND stavkaevidencijecasa.status='zakazan'";
-        PreparedStatement ps = conn.prepareStatement(query);
-        ps.setLong(1, i.getId());
-        ps.setLong(2, p.getId());
-        ResultSet rs = ps.executeQuery();
-        List<StavkaEvidencijeCasa> stavke = new LinkedList<StavkaEvidencijeCasa>();
-        while(rs.next()){
-            StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
-                (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(), 
-                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), 
-                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
-
-            stavke.add(stavka);
-        }
+//        Connection conn = DatabaseConnection.getInstance();
+//        String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
+//        "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
+//        "WHERE instruktor.id=? AND polaznik.id=? AND stavkaevidencijecasa.status='zakazan'";
+//        PreparedStatement ps = conn.prepareStatement(query);
+//        ps.setLong(1, i.getId());
+//        ps.setLong(2, p.getId());
+//        ResultSet rs = ps.executeQuery();
+//        List<StavkaEvidencijeCasa> stavke = new LinkedList<StavkaEvidencijeCasa>();
+//        while(rs.next()){
+//            StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
+//                (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(), 
+//                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), 
+//                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
+//
+//            stavke.add(stavka);
+//        }
+        List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
         TableModel tm = tblCasovi.getModel();
         DefaultTableModel dtm = (DefaultTableModel) tm;
         dtm.setRowCount(0);
@@ -97,7 +91,9 @@ public class Glavna extends javax.swing.JFrame {
         btnDodajCas.setEnabled(true);
         btnIzmeniCas.setEnabled(true);
         btnIzmeniPolaznik.setEnabled(true);
+        btnObrisiCas.setEnabled(true);
         btnObrisiPolaznik.setEnabled(true);
+
     }
     else{
         btnDodajCas.setEnabled(false);
@@ -238,6 +234,11 @@ public class Glavna extends javax.swing.JFrame {
         cmbPolaznik.setMaximumSize(new java.awt.Dimension(300, 32767));
         cmbPolaznik.setMinimumSize(new java.awt.Dimension(300, 22));
         cmbPolaznik.setPreferredSize(new java.awt.Dimension(300, 22));
+        cmbPolaznik.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbPolaznikItemStateChanged(evt);
+            }
+        });
         cmbPolaznik.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbPolaznikActionPerformed(evt);
@@ -465,7 +466,7 @@ public class Glavna extends javax.swing.JFrame {
             if(izbor == JOptionPane.YES_OPTION){
                 Connection conn = DatabaseConnection.getInstance();
                 Statement st = conn.createStatement();
-                String query = "UPDATE polaznik SET STATUS='upisan' WHERE id="+p.getId();
+                String query = "UPDATE polaznik SET STATUS='ispisan' WHERE id="+p.getId();
                 st.executeUpdate(query);
                 st.close();
                 cmbPolaznik.removeItem(p);
@@ -723,7 +724,8 @@ public class Glavna extends javax.swing.JFrame {
             StavkaEvidencijeCasa cas=new StavkaEvidencijeCasa();
             Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
             List<StavkaEvidencijeCasa> casovi = KontrolerStavke.getList(i, p);
-            int selektovanRed=tblCasovi.getSelectedRow();
+            Integer selektovanRed;
+            selektovanRed=tblCasovi.getSelectedRow();
             TableModel tm = tblCasovi.getModel();
             DefaultTableModel dtm = (DefaultTableModel) tm;
             for(int i=0;i<dtm.getRowCount();i++){
@@ -732,23 +734,53 @@ public class Glavna extends javax.swing.JFrame {
                 }
             }
             
-            
-            IzmenaCasova icf= new IzmenaCasova(this, rootPaneCheckingEnabled,i,p,cas);
-            icf.setVisible(true);
-            icf.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    try {
-                        refreshMainTable();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+            if(selektovanRed!=-1){
+                IzmenaCasova icf= new IzmenaCasova(this, rootPaneCheckingEnabled,cas);
+                icf.setVisible(true);
+                icf.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        try {
+                            refreshMainTable();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-            });
+                });
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Selektujete red za izmenu","Greska",JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnIzmeniCasActionPerformed
+
+    private void cmbPolaznikItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPolaznikItemStateChanged
+        // TODO add your handling code here:
+        if(cmbPolaznik.getSelectedItem()==null){
+            btnDodajCas.setEnabled(false);
+            btnIzmeniCas.setEnabled(false);
+            btnIzmeniPolaznik.setEnabled(false);
+            btnObrisiCas.setEnabled(false);
+            btnObrisiPolaznik.setEnabled(false);
+            txtIme.setText("");
+            txtPrezime.setText("");
+            txtBrTel.setText("");
+            txtCenaObuke.setText("");
+            txtDatumRodj.setDate(null);
+            txtEmail.setText("");
+        }
+        else{
+            btnDodajCas.setEnabled(true);
+            btnIzmeniCas.setEnabled(true);
+            btnIzmeniPolaznik.setEnabled(true);
+            btnObrisiCas.setEnabled(true);
+            btnObrisiPolaznik.setEnabled(true);
+        }
+    }//GEN-LAST:event_cmbPolaznikItemStateChanged
 
 
 
@@ -819,7 +851,6 @@ public class Glavna extends javax.swing.JFrame {
                 cmbPolaznik.addItem(p);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

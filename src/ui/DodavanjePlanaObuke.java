@@ -3,16 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package ui;
-import broker.DatabaseConnection;
-import domen.Instruktor;
-import domen.Kategorija;
+import domen.PlanObuke;
 import java.sql.*;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import kontroleri.KontrolerInstruktor;
-import kontroleri.KontrolerKategorija;
+import kontroleri.KontrolerPlanObuke;
 
 /**
  *
@@ -167,26 +163,20 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Svi podaci moraju biti uneti u ispravnom formatu","",JOptionPane.INFORMATION_MESSAGE);
         }
         else{
-        
-        Connection conn = DatabaseConnection.getInstance();
-        String query="INSERT INTO planobuke (naziv,opis) VALUES (?,?)";
-        PreparedStatement ps = conn.prepareStatement(query);
-        ps.setString(1, txtNaziv.getText());
-        ps.setString(2, txtOpis.getText());
-        ps.executeUpdate();
-        ps.close();
-        Object[] opcije = {"Da", "Ne"};
-        int izbor = JOptionPane.showOptionDialog(this,"Da li zelite da dodate jos jedan plan obuke?","Dodavanje plana obuke",
-                JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
-        
-        if(izbor == JOptionPane.NO_OPTION){
-            this.dispose();
+            PlanObuke plan = new PlanObuke(0l, txtNaziv.getText(), txtOpis.getText());
+            KontrolerPlanObuke.create(plan);
+            Object[] opcije = {"Da", "Ne"};
+            int izbor = JOptionPane.showOptionDialog(this,"Da li zelite da dodate jos jedan plan obuke?","Dodavanje plana obuke",
+                    JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
+
+            if(izbor == JOptionPane.NO_OPTION){
+                this.dispose();
+            }
+            else{
+                txtNaziv.setText("");
+                txtOpis.setText("");
+            }
         }
-        else{
-            txtNaziv.setText("");
-            txtOpis.setText("");
-        }
-      }
     }
 
     private boolean validacijaPlanObuke() {

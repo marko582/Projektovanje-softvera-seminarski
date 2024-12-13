@@ -4,26 +4,16 @@
  */
 package ui;
 
-import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.PlanObuke;
 import domen.Polaznik;
 import domen.StavkaEvidencijeCasa;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import kontroleri.KontrolerPlanObuke;
 import kontroleri.KontrolerStavke;
 
@@ -38,15 +28,12 @@ public class IzmenaCasova extends javax.swing.JDialog {
      */
     
     List<StavkaEvidencijeCasa> casovi = new ArrayList<StavkaEvidencijeCasa>();
-    Instruktor i;
-    Polaznik p;
+
     StavkaEvidencijeCasa cas;
-    public IzmenaCasova(java.awt.Frame parent, boolean modal,Instruktor i, Polaznik p,StavkaEvidencijeCasa cas) throws SQLException {
+    public IzmenaCasova(java.awt.Frame parent, boolean modal,StavkaEvidencijeCasa cas) throws SQLException {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(null);
-        this.i=i;
-        this.p=p;
         this.cas=cas;
         dtcDatum.setDate(cas.getDatumCasa());
         tmpPocetak.setTime(cas.getVremePocetkaCasa());
@@ -233,16 +220,12 @@ public class IzmenaCasova extends javax.swing.JDialog {
 
     private void btnIzmeniCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmeniCasActionPerformed
         try {
-            Connection conn = DatabaseConnection.getInstance();
-            Statement st = conn.createStatement();
-            String query = "UPDATE stavkaevidencijecasa SET datumCasa ='"+new java.sql.Date(dtcDatum.getDate().getTime())+"',"+
-            "vremePocetkaCasa='"+tmpPocetak.getTime() +"'," +
-            "vremeKrajaCasa='"+tmpKraj.getTime()+"'," +
-            "trajanjeCasa='"+Integer.valueOf(String.valueOf(Duration.between(tmpPocetak.getTime(), tmpKraj.getTime()).toMinutes()))+"', " +
-            "komentar='"+txtKomentar.getText()+"'," +
-            "idPlanObuke='"+((PlanObuke)cmbPlanRada.getSelectedItem()).getId()+"' WHERE id="+
-                    cas.getId()+" AND rb="+cas.getRb();
-            st.executeUpdate(query);
+            cas.setDatumCasa(new java.sql.Date(dtcDatum.getDate().getTime()));
+            cas.setVremePocetkaCasa(tmpPocetak.getTime());
+            cas.setVremeKrajaCasa(tmpKraj.getTime());
+            cas.setKomentar(txtKomentar.getText());
+            cas.setPlanObuke((PlanObuke) cmbPlanRada.getSelectedItem());
+            KontrolerStavke.update(cas);
             JOptionPane.showMessageDialog(null, "Cas uspesno izmenjen.","Izmena casa",JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
 

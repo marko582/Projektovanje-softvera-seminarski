@@ -4,15 +4,10 @@
  */
 package ui;
 
-import broker.DatabaseConnection;
+import domen.InsSer;
 import domen.Instruktor;
-import domen.Polaznik;
 import domen.Sertifikat;
-import domen.StavkaEvidencijeCasa;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,12 +17,11 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import kontroleri.KontrolerInstruktor;
 import kontroleri.KontrolerSertifikat;
-import kontroleri.KontrolerStavke;
-import java.sql.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import kontroleri.KontrolerInsSer;
+import kontroleri.KontrolerInstruktor;
 
 /**
  *
@@ -38,10 +32,6 @@ public class NalogInstruktora extends javax.swing.JDialog {
     /**
      * Creates new form NalogInstruktora
      */
-    public NalogInstruktora(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
-        initComponents();
-    }
     Instruktor ins;
     public NalogInstruktora(java.awt.Frame parent, boolean modal,Instruktor i) throws SQLException {
         super(parent, modal);
@@ -114,7 +104,7 @@ public class NalogInstruktora extends javax.swing.JDialog {
         btnIzmeni = new javax.swing.JButton();
         btnDodaj = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        btnObrisiSertifikat = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSertifikati = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
@@ -268,18 +258,18 @@ public class NalogInstruktora extends javax.swing.JDialog {
         jPanel5.setMinimumSize(new java.awt.Dimension(400, 350));
         jPanel5.setPreferredSize(new java.awt.Dimension(400, 350));
 
-        jButton2.setForeground(new java.awt.Color(255, 0, 0));
-        jButton2.setText("Obrisi sertifikat");
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton2.setMaximumSize(new java.awt.Dimension(150, 30));
-        jButton2.setMinimumSize(new java.awt.Dimension(150, 30));
-        jButton2.setPreferredSize(new java.awt.Dimension(150, 30));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnObrisiSertifikat.setForeground(new java.awt.Color(255, 0, 0));
+        btnObrisiSertifikat.setText("Obrisi sertifikat");
+        btnObrisiSertifikat.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnObrisiSertifikat.setMaximumSize(new java.awt.Dimension(150, 30));
+        btnObrisiSertifikat.setMinimumSize(new java.awt.Dimension(150, 30));
+        btnObrisiSertifikat.setPreferredSize(new java.awt.Dimension(150, 30));
+        btnObrisiSertifikat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnObrisiSertifikatActionPerformed(evt);
             }
         });
-        jPanel5.add(jButton2);
+        jPanel5.add(btnObrisiSertifikat);
 
         tblSertifikati.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -367,22 +357,18 @@ public class NalogInstruktora extends javax.swing.JDialog {
 
     private void btnIzmeniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIzmeniActionPerformed
         try {
-            Connection conn = DatabaseConnection.getInstance();
-            String query="UPDATE instruktor SET ime ='"+txtIme.getText()+"',prezime ='"+txtPrezime.getText()+"',"
-                    + "email ='"+txtEmail.getText()+"',korisnickoIme ='"+txtKorisnickoIme.getText()+"' WHERE id ="+ins.getId();
-            Statement st = conn.createStatement();
-            st.executeUpdate(query);
             ins.setIme(txtIme.getText());
             ins.setPrezime(txtPrezime.getText());
             ins.setEmail(txtEmail.getText());
             ins.setKorisnickoIme(txtKorisnickoIme.getText());
+            KontrolerInstruktor.update(ins);
             JOptionPane.showMessageDialog(this, "Uspesno ste izmenili podatke","Izmena podataka",JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(NalogInstruktora.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnIzmeniActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnObrisiSertifikatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnObrisiSertifikatActionPerformed
     Object[] opcije = {"Da", "Ne"};
     int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da obrisete sertifikat?","Brisanje sertifikata",
     JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
@@ -399,13 +385,9 @@ public class NalogInstruktora extends javax.swing.JDialog {
             for(int i=0;i<dtm.getRowCount();i++){
                 for(int j=0;j<selektovanRedovi.length;j++){
                     if(i==selektovanRedovi[j]){
-                       
-                            Connection conn = DatabaseConnection.getInstance();
-                            Statement st = conn.createStatement();
-                            String query = "DELETE FROM insser WHERE idInstruktor="+ins.getId()+ " AND "
-                                    + "idSertifikat ="+sertifikati.get(i).getId();
-                            st.executeUpdate(query);
-                            cmbSertifikat.removeItem(sertifikati.get(i));
+                        InsSer is = new InsSer(ins, sertifikati.get(i), null);
+                        KontrolerInsSer.delete(is);
+                        cmbSertifikat.removeItem(sertifikati.get(i));
                     }
                 }
             }
@@ -442,18 +424,14 @@ public class NalogInstruktora extends javax.swing.JDialog {
             btnDodaj.setEnabled(true);
         }
       }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnObrisiSertifikatActionPerformed
 
     private void btnDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDodajActionPerformed
         try {
             Sertifikat ser = (Sertifikat) cmbSertifikat.getSelectedItem();
-            Connection conn = DatabaseConnection.getInstance();
-            String query = "INSERT INTO insser (idInstruktor, idSertifikat, datumIzdavanja) " +
-            "VALUES ('"+ins.getId()+"', '"+ser.getId()+"','"+Date.valueOf(LocalDate.now())+"')";
-            Statement st = conn.createStatement();
-            st.executeUpdate(query);
+            KontrolerInsSer.create(ins, ser);
             
-                        TableModel tm = tblSertifikati.getModel();
+            TableModel tm = tblSertifikati.getModel();
             DefaultTableModel dtm = (DefaultTableModel) tm;
             dtm.setRowCount(0);
             List<Sertifikat> sertifikati = KontrolerSertifikat.getList(ins);
@@ -495,13 +473,8 @@ public class NalogInstruktora extends javax.swing.JDialog {
         if(txtStaraLozinka.getText().equals(ins.getLozinka())&&validateLozinka(txtNovaLozinka.getText())){
             try {
                 ins.setLozinka(txtNovaLozinka.getText());
-                String query="UPDATE instruktor SET lozinka ='"+txtNovaLozinka.getText()+
-                "',promenioLozinku=1 WHERE id ="+ins.getId();
-                Connection conn = DatabaseConnection.getInstance();
-                Statement st = conn.createStatement();
-                st.executeUpdate(query);
+                KontrolerInstruktor.updateLozinka(ins, ins.getLozinka());
                 JOptionPane.showMessageDialog(null, "Lozinka uspesno promenjena","Promena lozinke",JOptionPane.INFORMATION_MESSAGE);
-                
             } catch (SQLException ex) {
                 Logger.getLogger(NalogInstruktora.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -513,9 +486,9 @@ public class NalogInstruktora extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDodaj;
     private javax.swing.JButton btnIzmeni;
+    private javax.swing.JButton btnObrisiSertifikat;
     private javax.swing.JButton btnPromeniLozinku;
     private javax.swing.JComboBox<Sertifikat> cmbSertifikat;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

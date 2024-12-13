@@ -4,18 +4,11 @@
  */
 package ui;
 
-import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.PlanObuke;
 import domen.Polaznik;
 import domen.StavkaEvidencijeCasa;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import kontroleri.KontrolerEvidencija;
 import kontroleri.KontrolerPlanObuke;
 import kontroleri.KontrolerStavke;
 
@@ -37,11 +31,6 @@ public class DodavanjeCasova extends javax.swing.JDialog {
     /**
      * Creates new form DodavanjeCasova
      */
-    public DodavanjeCasova(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
-        initComponents();
-        this.setLocationRelativeTo(null);
-    }
     List<StavkaEvidencijeCasa> casovi = new ArrayList<StavkaEvidencijeCasa>();
     Instruktor i;
     Polaznik p;
@@ -275,13 +264,8 @@ public class DodavanjeCasova extends javax.swing.JDialog {
             }
             else{
                 
-            Connection conn = DatabaseConnection.getInstance();
-            Long id=0l;
-            String query="SELECT id FROM evidencijacasa WHERE idInstruktor="+i.getId()+" AND idPolaznika="+p.getId();
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            rs.next();
-            id=rs.getLong(1);
+            Long id=KontrolerEvidencija.getId(i, p);
+
             LocalTime t1 = tmpPocetak.getTime();
             LocalTime t2 = tmpKraj.getTime();
             Integer trajanje = Integer.valueOf(String.valueOf(Duration.between(t1, t2).toMinutes()));
@@ -308,22 +292,8 @@ public class DodavanjeCasova extends javax.swing.JDialog {
 
     private void btnKrajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKrajActionPerformed
         try {
-            Connection conn = DatabaseConnection.getInstance();
             for(StavkaEvidencijeCasa cas: casovi){
-                String query="INSERT INTO stavkaevidencijecasa" +
-                "(id, rb, datumCasa, vremePocetkaCasa, vremeKrajaCasa,trajanjeCasa, komentar, idPlanObuke)" +
-                "VALUES (?,?,?,?,?,?,?,?);";
-                PreparedStatement ps = conn.prepareStatement(query);
-                ps.setLong(1, cas.getId());
-                ps.setLong(2, cas.getRb());
-                ps.setDate(3, new java.sql.Date(cas.getDatumCasa().getTime()));
-                ps.setTime(4, Time.valueOf(cas.getVremePocetkaCasa()));
-                ps.setTime(5, Time.valueOf(cas.getVremeKrajaCasa()));
-                ps.setInt(6, Integer.valueOf(String.valueOf(Duration.between(cas.getVremePocetkaCasa(),cas.getVremeKrajaCasa() ).toMinutes())));
-                ps.setString(7, cas.getKomentar());
-                ps.setLong(8, cas.getPlanObuke().getId());
-                ps.executeUpdate();
-                ps.close();
+                KontrolerStavke.create(cas);
             }
             this.dispose();
         } catch (SQLException ex) {            

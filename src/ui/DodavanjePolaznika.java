@@ -6,7 +6,6 @@ package ui;
 import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.Kategorija;
-import domen.Polaznik;
 import java.sql.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -204,6 +203,7 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         String query="INSERT INTO polaznik (ime,prezime,email,brojTelefona,datumRodjenja,idKategorija) VALUES (?,?,?,?,?,?)";
         PreparedStatement ps = conn.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS);
         Long idKategorija=0l;
+//        Long idKategorija=KontrolerKategorija.getId((Kategorija) cmbKategorija.getSelectedItem());
         String query2="SELECT id FROM kategorija WHERE naziv='"+cmbKategorija.getSelectedItem()+"'";
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(query2);

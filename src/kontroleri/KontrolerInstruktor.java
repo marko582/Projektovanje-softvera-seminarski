@@ -9,6 +9,7 @@ import domen.Instruktor;
 import java.util.LinkedList;
 import java.util.List;
 import java.sql.*;
+import java.util.Random;
 
 /**
  *
@@ -34,5 +35,36 @@ public class KontrolerInstruktor {
         conn.close();
         
         return lista;
+    }
+    public static void create(Instruktor i) throws SQLException{
+            Connection conn = DatabaseConnection.getInstance();
+            String query="INSERT INTO instruktor (ime,prezime,email,korisnickoIme,lozinka,datumIvremeRegistracije) "
+                    + "VALUES (?,?,?,?,?,?)";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, i.getIme());
+            ps.setString(2, i.getPrezime());
+            ps.setString(3, i.getEmail());
+            ps.setString(4, i.getKorisnickoIme());
+            ps.setString(5, i.getLozinka());
+            ps.setTimestamp(6,new java.sql.Timestamp(System.currentTimeMillis()));
+            ps.executeUpdate();
+            ps.close();
+    }
+    public static void update(Instruktor i) throws SQLException{
+            Connection conn = DatabaseConnection.getInstance();
+            String query="UPDATE instruktor SET ime ='"+i.getIme()+"',prezime ='"+i.getPrezime()+"',"
+            + "email ='"+i.getEmail()+"',korisnickoIme ='"+i.getKorisnickoIme()+"' WHERE id ="+i.getId();
+            Statement st = conn.createStatement();
+            st.executeUpdate(query);
+            st.close();
+    }
+    
+    public static void updateLozinka(Instruktor i,String novaLozinka) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        String query="UPDATE instruktor SET lozinka ='"+novaLozinka+
+        "',promenioLozinku=1 WHERE id ="+i.getId();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
+        st.close();
     }
 }

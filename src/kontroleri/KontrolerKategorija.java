@@ -34,4 +34,12 @@ public class KontrolerKategorija {
         conn.close();
         return lista;
     }
+    public static Long getId(Kategorija k) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        String query="SELECT id FROM kategorija WHERE naziv='"+k.getNaziv()+"'";
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        rs.next();
+        return rs.getLong(1);
+    }
 }

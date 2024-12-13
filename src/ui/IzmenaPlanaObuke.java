@@ -3,19 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package ui;
-import broker.DatabaseConnection;
-import domen.Instruktor;
-import domen.Kategorija;
 import domen.PlanObuke;
-import domen.Polaznik;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import kontroleri.KontrolerInstruktor;
-import kontroleri.KontrolerKategorija;
 import kontroleri.KontrolerPlanObuke;
 
 /**
@@ -47,8 +40,6 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        txtTrajanje = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtOpis = new javax.swing.JTextArea();
@@ -79,22 +70,6 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
         jPanel3Layout.columnWidths = new int[] {0, 5, 0, 5, 0};
         jPanel3Layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         jPanel3.setLayout(jPanel3Layout);
-
-        jLabel3.setText("Trajanje:");
-        jLabel3.setPreferredSize(new java.awt.Dimension(50, 16));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanel3.add(jLabel3, gridBagConstraints);
-
-        txtTrajanje.setMaximumSize(new java.awt.Dimension(300, 20));
-        txtTrajanje.setMinimumSize(new java.awt.Dimension(64, 20));
-        txtTrajanje.setPreferredSize(new java.awt.Dimension(350, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
-        jPanel3.add(txtTrajanje, gridBagConstraints);
 
         jLabel2.setText("Opis:");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -178,7 +153,6 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
     private javax.swing.JComboBox<PlanObuke> cmbPlanObuke;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -186,21 +160,17 @@ public class IzmenaPlanaObuke extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField txtNaziv;
     private javax.swing.JTextArea txtOpis;
-    private javax.swing.JTextField txtTrajanje;
     // End of variables declaration//GEN-END:variables
 
     private void izmeniPlanObuke() throws SQLException {
         PlanObuke po = (PlanObuke) cmbPlanObuke.getSelectedItem();
+        po.setNaziv(txtNaziv.getText());
+        po.setOpis(txtOpis.getText());
         Object[] opcije = {"Da", "Ne"};
         int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da izmenite plan obuke ?","Plan obuke",
             JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
             if(izbor == JOptionPane.YES_OPTION){
-                Connection conn = DatabaseConnection.getInstance();
-                Statement st = conn.createStatement();
-                String query = "UPDATE planobuke SET naziv='"+txtNaziv.getName()+"'" +",opis='"+po.getOpis()
-                        +"' WHERE id="+po.getId();
-                st.executeUpdate(query);
-                st.close();
+                KontrolerPlanObuke.update(po);
                 JOptionPane.showMessageDialog(null, "Plan obuke uspesno izmenjen.","Izmena plan obuke",JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             }
