@@ -4,15 +4,10 @@
  */
 package ui;
 
-import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.Kategorija;
 import domen.Polaznik;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -212,21 +207,14 @@ public class IzmenaPolaznika extends javax.swing.JDialog {
         int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da izmenite podatke polaznika ?","Izmena polaznika",
             JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
             if(izbor == JOptionPane.YES_OPTION){
-                Connection conn = DatabaseConnection.getInstance();
-                Statement st = conn.createStatement();
-                Date datum = txtDatumRodj.getDate();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String formatiranDatum = sdf.format(datum);
-                String query = "UPDATE polaznik SET ime='"+txtIme.getText()+"',prezime='"+txtPrezime.getText()+
-                        "',email='"+txtEmail.getText()+"',brojTelefona='"+txtBrTel.getText()+
-                        "',datumRodjenja='"+formatiranDatum+"',idKategorija="
-                        +((Kategorija)cmbKategorija.getSelectedItem()).getId()
-                        + " WHERE id="+p.getId();
-                st.executeUpdate(query);
-                String query2="UPDATE evidencijacasa SET idInstruktor="+((Instruktor)cmbInstruktori.getSelectedItem()).getId()
-                        +" WHERE idPolaznika="+p.getId();
-                st.executeUpdate(query2);
-                st.close();
+                p.setIme(txtIme.getText());
+                p.setPrezime(txtPrezime.getText());
+                p.setEmail(txtEmail.getText());
+                p.setBrojTelefona(txtBrTel.getText());
+                p.setDatumRodjenja(txtDatumRodj.getDate());
+                p.setKategorija((Kategorija) cmbKategorija.getSelectedItem());
+                KontrolerPolaznik.update(p);
+
                 JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             }

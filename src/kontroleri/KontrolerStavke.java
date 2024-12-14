@@ -75,4 +75,22 @@ public class KontrolerStavke {
         st.executeUpdate(query);
         st.close();
     }
+    public static void otkazi(StavkaEvidencijeCasa cas) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        Statement st = conn.createStatement();
+        String query = "UPDATE stavkaevidencijecasa SET status = 'otkazan' WHERE id="+
+            cas.getId()+" AND rb="+cas.getRb();
+        st.executeUpdate(query);     
+        st.close();
+    }
+    public static Long getRb(Long id) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        Statement st = conn.createStatement();
+        String query = "SELECT MAX(rb) FROM stavkaevidencijecasa" +
+        " WHERE id = "+id+
+        " GROUP BY id";
+        ResultSet rs = st.executeQuery(query);
+        rs.next();
+        return rs.getLong(1);
+    }
 }

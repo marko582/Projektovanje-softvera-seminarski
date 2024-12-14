@@ -3,9 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package ui;
-import broker.DatabaseConnection;
+import domen.EvidencijaCasa;
 import domen.Instruktor;
 import domen.Kategorija;
+import domen.Polaznik;
 import java.sql.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -13,8 +14,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import kontroleri.KontrolerEvidencija;
 import kontroleri.KontrolerInstruktor;
 import kontroleri.KontrolerKategorija;
+import kontroleri.KontrolerPolaznik;
 
 /**
  *
@@ -199,68 +202,17 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Svi podaci moraju biti uneti u ispravnom formatu","",JOptionPane.INFORMATION_MESSAGE);
         }
         else{
-            Connection conn = DatabaseConnection.getInstance();
-        String query="INSERT INTO polaznik (ime,prezime,email,brojTelefona,datumRodjenja,idKategorija) VALUES (?,?,?,?,?,?)";
-        PreparedStatement ps = conn.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS);
-        Long idKategorija=0l;
-//        Long idKategorija=KontrolerKategorija.getId((Kategorija) cmbKategorija.getSelectedItem());
-        String query2="SELECT id FROM kategorija WHERE naziv='"+cmbKategorija.getSelectedItem()+"'";
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery(query2);
-        rs.next();
-        idKategorija=rs.getLong(1);
-        ps.setString(1, txtIme.getText());
-        ps.setString(2, txtPrezime.getText());
-        ps.setString(3, txtEmail.getText());
-        ps.setString(4, txtBrTel.getText());
-        ps.setDate(5, new java.sql.Date(((java.util.Date)txtDatumRodj.getDate()).getTime()));
-        ps.setLong(6, idKategorija);
-        ps.executeUpdate();
+        Long idKategorija=KontrolerKategorija.getId((Kategorija) cmbKategorija.getSelectedItem());
+        Polaznik polaznik = new Polaznik(0l, txtIme.getText(), txtPrezime.getText(), 
+        txtEmail.getText(), txtBrTel.getText(), txtDatumRodj.getDate(), (Kategorija)cmbKategorija.getSelectedItem());
         
-        rs=ps.getGeneratedKeys();
-        rs.next();
-        Long idPolaznik=rs.getLong(1);
-        this.polaznikId=idPolaznik;
-        ps.close();
-        
-        Integer cenaObuke=0;
-        switch (Long.valueOf(idKategorija).intValue()) {
-            case 1:
-                cenaObuke=67500;
-                break;
-            case 2:
-                cenaObuke=70000;
-                break;
-            case 3:
-                cenaObuke=72500;
-                break;
-            case 4:
-                cenaObuke=75000;
-                break;
-            case 5:
-                cenaObuke=80000;
-                break;
-            case 6:
-                cenaObuke=82500;
-                break;
-            case 7:
-                cenaObuke=85000;
-                break;
-            case 8:
-                cenaObuke=87500;
-                break;
-            case 9:
-                cenaObuke=90000;
-                break;
-            default:
-                throw new AssertionError();
-        }
+        this.polaznikId=KontrolerPolaznik.createGetId(polaznik);
+        polaznik.setId(polaznikId);
+        Integer cenaObuke=getCenaObuke(idKategorija);
         
         Instruktor instruktor = (Instruktor) cmbInstruktori.getSelectedItem();
-        String query3="INSERT INTO evidencijacasa (idInstruktor,idPolaznika,ukupnaCena) VALUES ("+instruktor.getId()+","
-                +idPolaznik+","+ cenaObuke +")";
-        
-        st.executeUpdate(query3);
+        EvidencijaCasa evc = new EvidencijaCasa(0l, cenaObuke, instruktor, polaznik);
+        KontrolerEvidencija.create(evc);
 
         
         
@@ -269,7 +221,6 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
                 + " Da li zelite da dodate jos jednog polaznika?","Dodavanje polaznika",
                 JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
         
-        st.close();
         if(izbor == JOptionPane.NO_OPTION){
             this.dispose();
         }
@@ -315,5 +266,40 @@ public class DodavanjePolaznika extends javax.swing.JDialog {
         Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+    public Integer getCenaObuke(Long idKategorija){
+        Integer cenaObuke=0;
+        switch (Long.valueOf(idKategorija).intValue()) {
+            case 1:
+                cenaObuke=67500;
+                break;
+            case 2:
+                cenaObuke=70000;
+                break;
+            case 3:
+                cenaObuke=72500;
+                break;
+            case 4:
+                cenaObuke=75000;
+                break;
+            case 5:
+                cenaObuke=80000;
+                break;
+            case 6:
+                cenaObuke=82500;
+                break;
+            case 7:
+                cenaObuke=85000;
+                break;
+            case 8:
+                cenaObuke=87500;
+                break;
+            case 9:
+                cenaObuke=90000;
+                break;
+            default:
+                throw new AssertionError();
+        }
+        return cenaObuke;
     }
 }

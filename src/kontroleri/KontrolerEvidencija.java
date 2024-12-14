@@ -5,6 +5,7 @@
 package kontroleri;
 
 import broker.DatabaseConnection;
+import domen.EvidencijaCasa;
 import domen.Instruktor;
 import domen.Polaznik;
 import java.sql.Connection;
@@ -24,5 +25,30 @@ public class KontrolerEvidencija {
         ResultSet rs = st.executeQuery(query);
         rs.next();
         return rs.getLong(1);
+    }
+    public static Integer getCenaObuke(Instruktor i, Polaznik p) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        String query="SELECT ukupnaCena FROM evidencijacasa WHERE idInstruktor="+i.getId()
+                + " AND idPolaznika="+p.getId();
+        Statement st = conn.createStatement();
+        ResultSet rs=st.executeQuery(query);
+        rs.next();
+        Integer cenaObuke=rs.getInt(1);
+        return cenaObuke;
+    }
+    public static void create(EvidencijaCasa evc) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        Statement st = conn.createStatement();
+        String query="INSERT INTO evidencijacasa (idInstruktor,idPolaznika,ukupnaCena) VALUES ("+evc.getInstruktor().getId()+","
+        +evc.getPolaznik().getId()+","+ evc.getUkupnaCena() +")";
+        st.executeUpdate(query);
+        st.close();
+    }
+    public static void update(EvidencijaCasa evc){
+//                Connection conn = DatabaseConnection.getInstance();
+//        String query2="UPDATE evidencijacasa SET idInstruktor="+((Instruktor)cmbInstruktori.getSelectedItem()).getId()
+//            +" WHERE idPolaznika="+p.getId();
+//    st.executeUpdate(query2);
+//    st.close();
     }
 }

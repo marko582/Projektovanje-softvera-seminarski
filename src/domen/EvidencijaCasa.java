@@ -20,7 +20,7 @@ public class EvidencijaCasa {
     }
 
     
-    public EvidencijaCasa(Long id, Integer ukupnaCena, Instruktor instruktor, Polaznik polaznik, List<StavkaEvidencijeCasa> stavke) {
+    public EvidencijaCasa(Long id, Integer ukupnaCena, Instruktor instruktor, Polaznik polaznik) {
         this.id = id;
         this.ukupnaCena = ukupnaCena;
         this.instruktor = instruktor;

@@ -4,19 +4,15 @@
  */
 package ui;
 
-import broker.DatabaseConnection;
 import domen.Instruktor;
 import domen.Kategorija;
-import domen.PlanObuke;
 import domen.Polaznik;
 import domen.StavkaEvidencijeCasa;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import kontroleri.KontrolerEvidencija;
 import kontroleri.KontrolerKategorija;
 import kontroleri.KontrolerPolaznik;
 import kontroleri.KontrolerStavke;
@@ -55,25 +52,7 @@ public class Glavna extends javax.swing.JFrame {
         napuniCmbKategorija();
         
         Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-        //lista stavki
     if(p!=null){
-//        Connection conn = DatabaseConnection.getInstance();
-//        String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
-//        "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
-//        "WHERE instruktor.id=? AND polaznik.id=? AND stavkaevidencijecasa.status='zakazan'";
-//        PreparedStatement ps = conn.prepareStatement(query);
-//        ps.setLong(1, i.getId());
-//        ps.setLong(2, p.getId());
-//        ResultSet rs = ps.executeQuery();
-//        List<StavkaEvidencijeCasa> stavke = new LinkedList<StavkaEvidencijeCasa>();
-//        while(rs.next()){
-//            StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
-//                (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(), 
-//                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"), 
-//                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
-//
-//            stavke.add(stavka);
-//        }
         List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
         TableModel tm = tblCasovi.getModel();
         DefaultTableModel dtm = (DefaultTableModel) tm;
@@ -429,25 +408,6 @@ public class Glavna extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-//        try {
-//           DodavanjePolaznika dpf= new DodavanjePolaznika(this, true);
-//           dpf.setVisible(true);
-//           Polaznik pol = dpf.vratiPolaznika();
-//           cmbPolaznik.addItem(pol);
-//
-//        } catch (SQLException ex) {
-//            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        
-//        try {
-//           DpParametar dpp= new DpParametar(this, true);
-//           dpp.setVisible(true);
-//           Polaznik pol = dpp.vratiPolaznika();
-//           cmbPolaznik.addItem(pol);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
@@ -464,41 +424,10 @@ public class Glavna extends javax.swing.JFrame {
                     JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
 
             if(izbor == JOptionPane.YES_OPTION){
-                Connection conn = DatabaseConnection.getInstance();
-                Statement st = conn.createStatement();
-                String query = "UPDATE polaznik SET STATUS='ispisan' WHERE id="+p.getId();
-                st.executeUpdate(query);
-                st.close();
+                KontrolerPolaznik.ispisi(p);
                 cmbPolaznik.removeItem(p);
                 JOptionPane.showMessageDialog(null, "Polaznik "+p.getIme()+" "+p.getPrezime() +" uspesno ispisan.","Ispisivanje polaznika",JOptionPane.INFORMATION_MESSAGE);
             }
-            
-            
-//            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-//            Object[] opcije = {"Da", "Ne"};
-//            int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da obrisete polaznika "
-//                    +p.getIme()+" "+p.getPrezime()+"?","Dodavanje polaznika",
-//                    JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
-//
-//            if(izbor == JOptionPane.YES_OPTION){
-//                Connection conn = DatabaseConnection.getInstance();
-//                Statement st = conn.createStatement();
-//                String query4 = "SELECT id FROM evidencijacasa WHERE idPolaznika="+p.getId() +" AND idInstruktor="+i.getId();
-//                ResultSet rs = st.executeQuery(query4);
-//                rs.next();
-//                Long idCasa = rs.getLong(1);
-//                String query3 ="DELETE FROM stavkaevidencijecasa WHERE id="+idCasa;
-//                st.executeUpdate(query3);
-//                String query2 = "DELETE FROM evidencijacasa WHERE idInstruktor="+i.getId() +" AND idPolaznika="+p.getId();
-//                st.executeUpdate(query2);
-//                String query = "DELETE FROM polaznik WHERE id="+p.getId();
-//                st.executeUpdate(query);
-//                st.close();
-//                cmbPolaznik.removeItem(p);
-//                JOptionPane.showMessageDialog(null, "Polaznik "+p.getIme()+" "+p.getPrezime() +" uspesno obrisan.","Brisanje polaznika",JOptionPane.INFORMATION_MESSAGE);
-//            
-
-            
         } catch (SQLException ex) {
             Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -528,35 +457,14 @@ public class Glavna extends javax.swing.JFrame {
             DefaultTableModel dtm = (DefaultTableModel) tm;
             dtm.setRowCount(0);
             //lista stavki
-            Connection conn = DatabaseConnection.getInstance();
-            String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
-                    "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
-                    "WHERE instruktor.id=? AND polaznik.id=? AND stavkaevidencijecasa.status='zakazan'";
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setLong(1, i.getId());
-            ps.setLong(2, p.getId());
-            ResultSet rs = ps.executeQuery();
-            List<StavkaEvidencijeCasa> stavke = new LinkedList<StavkaEvidencijeCasa>();
-            while(rs.next()){
-                StavkaEvidencijeCasa stavka = new StavkaEvidencijeCasa
-                        (rs.getLong("id"), rs.getLong("rb"), rs.getDate("datumCasa"), rs.getTime("vremePocetkaCasa").toLocalTime(),
-                                rs.getTime("vremeKrajaCasa").toLocalTime(), rs.getInt("trajanjeCasa"),
-                                rs.getString("komentar"), rs.getString("status"),new PlanObuke(rs.getLong("idPlanObuke"), rs.getString("naziv"), rs.getString("opis")));
-                
-                stavke.add(stavka);
-            }
+            List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
+            
             for(StavkaEvidencijeCasa s: stavke){
                 Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
                     s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
                 dtm.addRow(red);
             }
-            
-            String query2="SELECT ukupnaCena FROM evidencijacasa WHERE idInstruktor="+i.getId()
-                    + " AND idPolaznika="+p.getId();
-            Statement st = conn.createStatement();
-            rs=st.executeQuery(query2);
-            rs.next();
-            Integer cenaObuke=rs.getInt(1);
+            Integer cenaObuke=KontrolerEvidencija.getCenaObuke(i, p);
             txtCenaObuke.setText(String.valueOf(cenaObuke));
 
             
@@ -586,14 +494,8 @@ public class Glavna extends javax.swing.JFrame {
             DefaultTableModel dtm = (DefaultTableModel) tm;
             for(int i=0;i<dtm.getRowCount();i++){
                 for(int j=0;j<selektovanRedovi.length;j++){
-                    if(i==selektovanRedovi[j]){
-                       
-                            Connection conn = DatabaseConnection.getInstance();
-                            Statement st = conn.createStatement();
-                            String query = "UPDATE stavkaevidencijecasa SET status = 'otkazan' WHERE id="+
-                                casovi.get(i).getId()+" AND rb="+casovi.get(i).getRb();
-                            st.executeUpdate(query);
-                        
+                    if(i==selektovanRedovi[j]){      
+                        KontrolerStavke.otkazi(casovi.get(i));                    
                     }
                 }
             }
@@ -645,26 +547,11 @@ public class Glavna extends javax.swing.JFrame {
         
         
             if(izbor == JOptionPane.YES_OPTION){
-                try {
-                    Connection conn = DatabaseConnection.getInstance();
-                    Statement st = conn.createStatement();
-                    java.util.Date datum = txtDatumRodj.getDate();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    String formatiranDatum = sdf.format(datum);
-                    String query = "UPDATE polaznik SET ime='"+txtIme.getText()+"',prezime='"+txtPrezime.getText()+
-                            "',email='"+txtEmail.getText()+"',brojTelefona='"+txtBrTel.getText()+
-                            "',datumRodjenja='"+formatiranDatum+"',idKategorija="
-                            +((Kategorija)cmbKategorija.getSelectedItem()).getId()
-                            + " WHERE id="+p.getId();
-                    st.executeUpdate(query);
-                    String query2="UPDATE evidencijacasa SET idInstruktor="+i.getId()
-                            +" WHERE idPolaznika="+p.getId();
-                    st.executeUpdate(query2);
-                    st.close();
+                try {                    
+                    Polaznik polaznik = new Polaznik(p.getId(), txtIme.getText(), txtPrezime.getText(), 
+                    txtEmail.getText(), txtBrTel.getText(), txtDatumRodj.getDate(), (Kategorija)cmbKategorija.getSelectedItem());
+                    KontrolerPolaznik.update(polaznik);
                     JOptionPane.showMessageDialog(null, "Polaznik uspesno izmenjen.","Izmena polaznika",JOptionPane.INFORMATION_MESSAGE);
-                    
-                    
-                    
                     
                     
                 } catch (SQLException ex) {
@@ -697,9 +584,15 @@ public class Glavna extends javax.swing.JFrame {
     private void btnDodajCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDodajCasActionPerformed
         TableModel tm = tblCasovi.getModel();
         DefaultTableModel dtm =(DefaultTableModel) tm;
-        rb=Long.valueOf(dtm.getRowCount());
+        // ne sme ovako rb
+//        rb=Long.valueOf(dtm.getRowCount());
+        Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
         try {
-            Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
+            rb=KontrolerStavke.getRb(KontrolerEvidencija.getId(i, p));
+        } catch (SQLException ex) {
+            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
             DodavanjeCasova dcf = new DodavanjeCasova(this, true, i, p, rb);
             dcf.setVisible(true);
             dcf.addWindowListener(new WindowAdapter() {

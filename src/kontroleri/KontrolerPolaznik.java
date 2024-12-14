@@ -10,6 +10,7 @@ import domen.Kategorija;
 import domen.Polaznik;
 import java.util.List;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 
 /**
@@ -68,5 +69,43 @@ public class KontrolerPolaznik {
         st.close();
         conn.close();
         return lista;
+    }
+    public static Long createGetId(Polaznik p) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        String query="INSERT INTO polaznik (ime,prezime,email,brojTelefona,datumRodjenja,idKategorija) VALUES (?,?,?,?,?,?)";
+        PreparedStatement ps = conn.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS);
+        ps.setString(1, p.getIme());
+        ps.setString(2, p.getPrezime());
+        ps.setString(3, p.getEmail());
+        ps.setString(4, p.getBrojTelefona());
+        ps.setDate(5, new java.sql.Date(((java.util.Date)p.getDatumRodjenja()).getTime()));
+        ps.setLong(6, p.getKategorija().getId());
+        ps.executeUpdate();
+        ResultSet rs=ps.getGeneratedKeys();
+        rs.next();
+        return rs.getLong(1);
+    }
+    
+    public static void update(Polaznik p) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        Statement st = conn.createStatement();
+        java.util.Date datum = p.getDatumRodjenja();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formatiranDatum = sdf.format(datum);
+        String query = "UPDATE polaznik SET ime='"+p.getIme()+"',prezime='"+p.getPrezime()+
+        "',email='"+p.getEmail()+"',brojTelefona='"+p.getBrojTelefona()+
+        "',datumRodjenja='"+formatiranDatum+"',idKategorija="
+        +p.getKategorija().getId()
+        + " WHERE id="+p.getId();
+        st.executeUpdate(query);
+        st.close();
+    }
+    
+    public static void ispisi(Polaznik p) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        Statement st = conn.createStatement();
+        String query = "UPDATE polaznik SET STATUS='ispisan' WHERE id="+p.getId();
+        st.executeUpdate(query);
+        st.close();
     }
 }
