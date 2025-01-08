@@ -245,7 +245,7 @@ public class Registracija extends javax.swing.JFrame {
             
             if(validateEmail(txtEmail.getText())
                 &&txtKorisnickoIme.getText().length()>2 && !txtIme.getText().equals("") && !txtPrezime.getText().equals("")){
-                System.out.println("radi");
+//                System.out.println("radi");
                 kreirajInstruktora();
             }
             if(txtIme.getText().equals("")){

@@ -4,11 +4,14 @@
  */
 package main;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
-import ui.Login;
+import domen.Instruktor;
+import java.sql.SQLException;
 
 
 
 import javax.mail.*;
+import ui.GlavnaAdmin;
+import ui.Login;
 /**
  *
  * @author Windows HD
@@ -18,9 +21,10 @@ public class ProjektovanjeSoftvera {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws MessagingException {
+    public static void main(String[] args) throws MessagingException, SQLException {
         FlatMacLightLaf.setup();
         new Login().setVisible(true);
+
 
 //    email.EmailSender.posaljiEmail("markomijailovic03@gmail.com","markojekralj");
 

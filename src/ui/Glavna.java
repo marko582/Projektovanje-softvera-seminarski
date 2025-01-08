@@ -53,7 +53,7 @@ public class Glavna extends javax.swing.JFrame {
         
         Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
     if(p!=null){
-        List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
+        List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(p);
         TableModel tm = tblCasovi.getModel();
         DefaultTableModel dtm = (DefaultTableModel) tm;
         dtm.setRowCount(0);
@@ -103,8 +103,6 @@ public class Glavna extends javax.swing.JFrame {
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(50, 0), new java.awt.Dimension(32767, 0));
         lblIzmenaLozinke = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(70, 0), new java.awt.Dimension(32767, 0));
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -165,12 +163,6 @@ public class Glavna extends javax.swing.JFrame {
         jPanel2.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jTextField1.setPreferredSize(new java.awt.Dimension(100, 22));
-        jPanel8.add(jTextField1);
-
-        jButton1.setText("Pretrazi");
-        jPanel8.add(jButton1);
         jPanel8.add(filler2);
 
         jPanel2.add(jPanel8);
@@ -457,14 +449,14 @@ public class Glavna extends javax.swing.JFrame {
             DefaultTableModel dtm = (DefaultTableModel) tm;
             dtm.setRowCount(0);
             //lista stavki
-            List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
+            List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(p);
             
             for(StavkaEvidencijeCasa s: stavke){
                 Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
                     s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
                 dtm.addRow(red);
             }
-            Integer cenaObuke=KontrolerEvidencija.getCenaObuke(i, p);
+            Integer cenaObuke=KontrolerEvidencija.getCenaObuke(p);
             txtCenaObuke.setText(String.valueOf(cenaObuke));
 
             
@@ -477,6 +469,13 @@ public class Glavna extends javax.swing.JFrame {
 
     private void btnObrisiCasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnObrisiCasActionPerformed
         
+     int selektovanRedovi[]={};
+        selektovanRedovi=tblCasovi.getSelectedRows();
+    if(selektovanRedovi.length==0){
+        JOptionPane.showMessageDialog(this, "Izaberite cas za brisanje","Greska",JOptionPane.ERROR_MESSAGE);
+    }else{
+        
+        
     Object[] opcije = {"Da", "Ne"};
     int izbor = JOptionPane.showOptionDialog(this,"Da li sigurno zelite da otkazete cas/ove?","Otkazivanje casova",
     JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[1]);
@@ -486,10 +485,9 @@ public class Glavna extends javax.swing.JFrame {
         try {
             
             Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-            List<StavkaEvidencijeCasa> casovi = KontrolerStavke.getList(i, p);
+            List<StavkaEvidencijeCasa> casovi = KontrolerStavke.getList(p);
             
-            int selektovanRedovi[]={};
-            selektovanRedovi=tblCasovi.getSelectedRows();
+
             TableModel tm = tblCasovi.getModel();
             DefaultTableModel dtm = (DefaultTableModel) tm;
             for(int i=0;i<dtm.getRowCount();i++){
@@ -504,7 +502,7 @@ public class Glavna extends javax.swing.JFrame {
             
             dtm.setRowCount(0);
             
-            List<StavkaEvidencijeCasa> casovi2=KontrolerStavke.getList(i, p);
+            List<StavkaEvidencijeCasa> casovi2=KontrolerStavke.getList(p);
             for(StavkaEvidencijeCasa s: casovi2){
                 Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
                   s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};
@@ -512,9 +510,10 @@ public class Glavna extends javax.swing.JFrame {
             }
             
         } catch (SQLException ex) {
-            Logger.getLogger(Glavna.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GlavnaAdmin.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
+    }
     }//GEN-LAST:event_btnObrisiCasActionPerformed
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
@@ -616,7 +615,7 @@ public class Glavna extends javax.swing.JFrame {
         try {
             StavkaEvidencijeCasa cas=new StavkaEvidencijeCasa();
             Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-            List<StavkaEvidencijeCasa> casovi = KontrolerStavke.getList(i, p);
+            List<StavkaEvidencijeCasa> casovi = KontrolerStavke.getList(p);
             Integer selektovanRed;
             selektovanRed=tblCasovi.getSelectedRow();
             TableModel tm = tblCasovi.getModel();
@@ -688,7 +687,6 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.Box.Filler filler3;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -712,7 +710,6 @@ public class Glavna extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblInstruktor;
     private javax.swing.JLabel lblIzmenaLozinke;
     private javax.swing.JMenu meniNalog;
@@ -757,7 +754,7 @@ public class Glavna extends javax.swing.JFrame {
         DefaultTableModel dtm =(DefaultTableModel) tm;
         dtm.setRowCount(0);
         Polaznik p = (Polaznik) cmbPolaznik.getSelectedItem();
-        List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(i, p);
+        List<StavkaEvidencijeCasa> stavke = KontrolerStavke.getList(p);
         for(StavkaEvidencijeCasa s: stavke){
             Object[] red = new Object[]{s.getRb(),s.getDatumCasa(),s.getVremePocetkaCasa()+"h",
                 s.getVremeKrajaCasa()+"h",s.getTrajanjeCasa()+"min",s.getPlanObuke().getNaziv()};

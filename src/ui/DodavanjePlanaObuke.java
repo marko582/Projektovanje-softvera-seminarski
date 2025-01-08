@@ -170,6 +170,7 @@ public class DodavanjePlanaObuke extends javax.swing.JDialog {
                     JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opcije,opcije[0]);
 
             if(izbor == JOptionPane.NO_OPTION){
+                JOptionPane.showMessageDialog(this, "Uspesno dodat plan obuke","",JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             }
             else{

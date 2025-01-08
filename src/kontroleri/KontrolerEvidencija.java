@@ -26,14 +26,15 @@ public class KontrolerEvidencija {
         rs.next();
         return rs.getLong(1);
     }
-    public static Integer getCenaObuke(Instruktor i, Polaznik p) throws SQLException{
+    public static Integer getCenaObuke(Polaznik p) throws SQLException{
         Connection conn = DatabaseConnection.getInstance();
-        String query="SELECT ukupnaCena FROM evidencijacasa WHERE idInstruktor="+i.getId()
-                + " AND idPolaznika="+p.getId();
+        String query="SELECT ukupnaCena FROM evidencijacasa WHERE idPolaznika="+p.getId();
         Statement st = conn.createStatement();
         ResultSet rs=st.executeQuery(query);
-        rs.next();
-        Integer cenaObuke=rs.getInt(1);
+        Integer cenaObuke = 0;
+        if(rs.next()){
+            cenaObuke=rs.getInt(1);
+        }
         return cenaObuke;
     }
     public static void create(EvidencijaCasa evc) throws SQLException{
@@ -43,12 +44,5 @@ public class KontrolerEvidencija {
         +evc.getPolaznik().getId()+","+ evc.getUkupnaCena() +")";
         st.executeUpdate(query);
         st.close();
-    }
-    public static void update(EvidencijaCasa evc){
-//                Connection conn = DatabaseConnection.getInstance();
-//        String query2="UPDATE evidencijacasa SET idInstruktor="+((Instruktor)cmbInstruktori.getSelectedItem()).getId()
-//            +" WHERE idPolaznika="+p.getId();
-//    st.executeUpdate(query2);
-//    st.close();
     }
 }

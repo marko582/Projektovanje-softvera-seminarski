@@ -6,10 +6,10 @@ package kontroleri;
 
 import broker.DatabaseConnection;
 import domen.Instruktor;
+import domen.Polaznik;
 import java.util.LinkedList;
 import java.util.List;
 import java.sql.*;
-import java.util.Random;
 
 /**
  *
@@ -58,6 +58,13 @@ public class KontrolerInstruktor {
             st.executeUpdate(query);
             st.close();
     }
+    public static void otkaz(Instruktor i) throws SQLException{
+            Connection conn = DatabaseConnection.getInstance();
+            String query="UPDATE instruktor SET status ='otkaz' WHERE id ="+i.getId();
+            Statement st = conn.createStatement();
+            st.executeUpdate(query);
+            st.close();
+    }
     
     public static void updateLozinka(Instruktor i,String novaLozinka) throws SQLException{
         Connection conn = DatabaseConnection.getInstance();
@@ -66,5 +73,30 @@ public class KontrolerInstruktor {
         Statement st = conn.createStatement();
         st.executeUpdate(query);
         st.close();
+    }
+    
+    public static Instruktor getInstruktorPolaznika(Polaznik p) throws SQLException{
+        Connection conn = DatabaseConnection.getInstance();
+        String query = "SELECT idInstruktor FROM evidencijacasa WHERE idPolaznika="+p.getId();
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        Long idInstruktor = 0l;
+        if(rs.next())
+            idInstruktor = rs.getLong(1);
+        else
+            return null;
+        query = "SELECT * FROM instruktor WHERE id="+idInstruktor;
+        st=conn.createStatement();
+        rs=st.executeQuery(query);
+        if(rs.next()){
+            Instruktor instruktor = new Instruktor(rs.getLong("id"), 
+                    rs.getString("ime"), rs.getString("prezime"), 
+                    rs.getString("email"), rs.getString("korisnickoIme"), 
+                    rs.getString("lozinka"));
+            return instruktor;
+        }
+        else{
+            return null;
+        }
     }
 }

@@ -24,15 +24,14 @@ import java.util.List;
  * @author Windows HD
  */
 public class KontrolerStavke {
-    public static List<StavkaEvidencijeCasa> getList(Instruktor i, Polaznik p) throws SQLException{
+    public static List<StavkaEvidencijeCasa> getList(Polaznik p) throws SQLException{
         List<StavkaEvidencijeCasa> lista = new LinkedList<>();
         Connection conn = DatabaseConnection.getInstance();
         String query="SELECT * FROM stavkaevidencijecasa JOIN planobuke ON planobuke.id=stavkaevidencijecasa.idPlanObuke JOIN evidencijacasa ON evidencijacasa.id=stavkaevidencijecasa.id JOIN instruktor \n" +
                 "ON  evidencijacasa.idInstruktor=instruktor.id JOIN polaznik ON polaznik.id=evidencijacasa.idPolaznika \n" +
-                "WHERE instruktor.id=? AND polaznik.id=? AND stavkaevidencijecasa.status='zakazan'";
+                "WHERE polaznik.id=? AND stavkaevidencijecasa.status='zakazan'";
         PreparedStatement ps = conn.prepareStatement(query);
-        ps.setLong(1, i.getId());
-        ps.setLong(2, p.getId());
+        ps.setLong(1, p.getId());
         ResultSet rs = ps.executeQuery();
 
         while(rs.next()){

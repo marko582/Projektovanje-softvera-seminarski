@@ -133,6 +133,12 @@ public class Login extends javax.swing.JFrame {
         String korisnickoIme = txtKorisnickoIme.getText();
         String lozinka = txtLozinka.getText();
         try {
+            if(korisnickoIme.equals("admin")&& lozinka.equals("admin")){
+                this.dispose();
+                JFrame glavnaAdmin= new GlavnaAdmin();
+                glavnaAdmin.setVisible(true);
+                return;
+            }
             List<Instruktor> instruktori = KontrolerInstruktor.getList();
             for(Instruktor i : instruktori){
                 if(i.getKorisnickoIme().equals(korisnickoIme) && i.getLozinka().equals(lozinka)){

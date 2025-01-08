@@ -23,7 +23,8 @@ public class KontrolerPolaznik {
         List<Polaznik> lista = new LinkedList<>();
         String query = "SELECT polaznik.id,polaznik.ime,polaznik.prezime,polaznik.email,"
         + "polaznik.brojTelefona,polaznik.datumRodjenja,polaznik.idKategorija,kategorija.naziv FROM polaznik "
-        + "JOIN kategorija ON (polaznik.idKategorija=kategorija.id)";
+        + "JOIN kategorija ON (polaznik.idKategorija=kategorija.id) AND polaznik.status='upisan'"
+        + " ORDER BY polaznik.prezime";
         Connection conn = DatabaseConnection.getInstance();
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(query);

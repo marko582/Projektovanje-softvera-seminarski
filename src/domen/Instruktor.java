@@ -4,6 +4,7 @@
  */
 package domen;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -18,6 +19,7 @@ public class Instruktor {
     private String korisnickoIme;
     private String lozinka;
     private String status="zaposlen";
+    private LocalDateTime datumIvremeRegistracije;
 
     public Instruktor() {
     }
@@ -31,6 +33,17 @@ public class Instruktor {
         this.korisnickoIme = korisnickoIme;
         this.lozinka = lozinka;
     }
+
+    public Instruktor(Long id, String ime, String prezime, String email, String korisnickoIme, String lozinka, LocalDateTime datumIvremeRegistracije) {
+        this.id = id;
+        this.ime = ime;
+        this.prezime = prezime;
+        this.email = email;
+        this.korisnickoIme = korisnickoIme;
+        this.lozinka = lozinka;
+        this.datumIvremeRegistracije = datumIvremeRegistracije;
+    }
+
 
     public String getStatus() {
         return status;
@@ -88,6 +101,14 @@ public class Instruktor {
 
     public void setLozinka(String lozinka) {
         this.lozinka = lozinka;
+    }
+
+    public LocalDateTime getDatumIvremeRegistracije() {
+        return datumIvremeRegistracije;
+    }
+
+    public void setDatumIvremeRegistracije(LocalDateTime datumIvremeRegistracije) {
+        this.datumIvremeRegistracije = datumIvremeRegistracije;
     }
 
     @Override
